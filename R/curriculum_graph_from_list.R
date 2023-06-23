@@ -54,7 +54,7 @@ curriculum_graph_from_list <- function(node_list, edge_list) {
   sc_df <- structural_complexity(node_list, edge_list)
   sc <- sc_df$bynode
 
-  node_list <- left_join(node_list, sc, by = c("id" = "id"))
+  node_list <- dplyr::left_join(node_list, sc, by = c("id" = "id"))
 
   obj$node_list <- node_list
   obj$edge_list <- edge_list
