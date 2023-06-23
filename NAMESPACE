@@ -3,3 +3,4 @@
 export(blocking_factor)
 export(centrality_factor)
 export(delay_factor)
+export(structural_complexity)
