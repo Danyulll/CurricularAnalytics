@@ -3,7 +3,7 @@
 #'A helper function for calculating the blocking factor for each node and the
 #'total blocking factor of a curriculum graph.
 #'
-#'More formally the blocking factor of a node \eqn{v_i} is defined as
+#'Blocking quantifies when a failing a course would result in being blocked from registering for future courses. More formally the blocking factor of a node \eqn{v_i} is defined as
 #'\deqn{b_c(v_i) = \sum_{v_j \in V} I(v_i,v_j)} where \eqn{I} is the indicator
 #'function: \deqn{=\begin{cases}1, & \text{if } v_i \rightsquigarrow v_j \\ 0, &
 #'\text{if }v_i \cancel{\rightsquigarrow} v_j\end{cases}}
@@ -36,7 +36,6 @@
 #'# 3  2  0
 #'# 4  3  1
 #'# 5  4  0
-
 #'# $total
 #'# [1] 3
 #'@export
@@ -70,7 +69,7 @@ blocking_factor <- function(node_list,edge_list) {
       rbind(bynode, data.frame(id = v, bf = length(nodes_reachable)))
   }
 
-  bynode <- na.omit(bynode)
+  bynode <- stats::na.omit(bynode)
 
   list(bynode = bynode, total = sum(bynode$bf))
 
