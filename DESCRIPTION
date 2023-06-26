@@ -16,4 +16,7 @@ Imports:
     dplyr,
     igraph,
     jsonlite,
-    visNetwork
+    visNetwork,
+    tibble,
+    stats,
+    magrittr

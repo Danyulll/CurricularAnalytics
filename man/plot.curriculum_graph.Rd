@@ -20,7 +20,12 @@ representing the curriculum graph.
 }
 \examples{
 edge_list <- data.frame(from = c(1, 3), to = c(3, 4))
-node_list <- data.frame(id = 1:4, label = c("MATH 100","DATA 101","MATH 101","MATH 221"), term = c(1,1,2,2))
+node_list <-
+data.frame(
+ id = 1:4,
+ label = c("MATH 100", "DATA 101", "MATH 101", "MATH 221"),
+ term = c(1, 1, 2, 2)
+)
 C <- curriculum_graph_from_list(node_list,edge_list)
 plot(C)
 }

@@ -35,7 +35,12 @@ The blocking factor for an entire curriculum graph \eqn{G_c} is defined as
 }
 \examples{
 edge_list <- data.frame(from = c(1, 3), to = c(3, 4))
-node_list <- data.frame(id = 1:4, label = c("MATH 100","DATA 101","MATH 101","MATH 221"), term = c(1,1,2,2))
+node_list <-
+data.frame(
+id = 1:4,
+label = c("MATH 100", "DATA 101", "MATH 101", "MATH 221"),
+term = c(1, 1, 2, 2)
+)
 bf_list <- blocking_factor(node_list,edge_list)
 print(bf_list)
 # Output:

@@ -13,7 +13,7 @@ generate_coords <- function(curriculum_graph) {
     coords <- rbind(coords, c(term, idx))
   }
 
-  coords <- na.omit(coords)
+  coords <- stats::na.omit(coords)
   return(coords)
 }
 
@@ -23,8 +23,8 @@ generate_coords <- function(curriculum_graph) {
 #'representing the curriculum graph.
 #'
 #'@param curriculum_graph  A curriculum_graph object created with either
-#'  [curriculum_graph_from_list()] or
-#'  [curriculum_graph_from_json()]
+#'  [CurricularAnalytics::curriculum_graph_from_list()] or
+#'  [CurricularAnalytics::curriculum_graph_from_json()]
 #'
 #'@return No object is returned. Rather the graph is plotted according to the specified term order in node_list. Clicking on a node will reveal its label, structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df)
 #'@author Daniel Krasnov
@@ -35,7 +35,12 @@ generate_coords <- function(curriculum_graph) {
 #'@examples
 #'edge_list <- data.frame(from = c(1, 3), to = c(3, 4))
 # courses in node list must be placed sequentially in term order to be properly displayed
-#'node_list <- data.frame(id = 1:4, label = c("MATH 100","DATA 101","MATH 101","MATH 221"), term = c(1,1,2,2))
+#'node_list <-
+#'data.frame(
+#'  id = 1:4,
+#'  label = c("MATH 100", "DATA 101", "MATH 101", "MATH 221"),
+#'  term = c(1, 1, 2, 2)
+#')
 #'C <- curriculum_graph_from_list(node_list,edge_list)
 #'plot(C)
 #'@export
