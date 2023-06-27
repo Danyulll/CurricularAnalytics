@@ -160,11 +160,6 @@ DS majors, the 2022 DS minor, and the proposal of a math stream in the
 ## 2022/2023 DS Major
 
 
-
-
-
-
-
 :::: {style="display: flex;"}
 
 ::: {}
@@ -191,7 +186,83 @@ In CurricularAnalytics we store curriculum graphs in json files as suggested in 
 
 ```{r setup}
 library(CurricularAnalytics)
+C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-2022-2023.json")
+C$node_list
+
+
+ edge_list <- data.frame(from = NA, to = NA)
+
+  for (node in df$label) {
+    str <- subset(df, label == node)$prerequisites[[1]]
+    course_code <- ""
+    if (!is.null(str)) {
+      course_code <- str
+    }
+
+    from <- rownames(subset(df, label == node))
+    to <- rownames(subset(df, label %in% course_code))
+    if (length(to) > 1) {
+      for (id in to) {
+        edge_list <- rbind(edge_list, data.frame(from = id, to = from))
+      }
+    } else {
+      edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
+    }
+  }
+  edge_list <- stats::na.omit(edge_list)
+
+
+
+
+
+
+
+
+
+
+
+# plot(C)
 ```
+
+```{r}
+file <- "C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-2022-2023.json"
+ if (file.exists(file)) {
+    file_extension <- tools::file_ext(file)
+    if (file_extension != "json") {
+      stop("File exists but is not a JSON file.")
+    }
+  } else {
+    stop("File does not exist or cannot be found.")
+  }
+
+  file <- jsonlite::fromJSON(file)
+  json_data <- jsonlite::fromJSON(file)
+  df <- json_data$courses
+  node_list <-
+    data.frame(id = as.numeric(rownames(df)), label = df$label, term = df$term)
+
+  edge_list <- data.frame(from = NA, to = NA)
+
+  for (node in df$name) {
+    str <- subset(df, name == node)$prerequisites[[1]]
+    course_code <- ""
+    if (!is.null(str)) {
+      course_code <- str
+    }
+
+    from <- rownames(subset(df, name == node))
+    to <- rownames(subset(df, name %in% course_code))
+    if (length(to) > 1) {
+      for (id in to) {
+        edge_list <- rbind(edge_list, data.frame(from = id, to = from))
+      }
+    } else {
+      edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
+    }
+  }
+  edge_list <- stats::na.omit(edge_list)
+```
+
 
 # Conclusion
 

@@ -19,7 +19,6 @@
 #'
 #'
 curriculum_graph_from_json <- function(file) {
-  file <- "test.json"
   if (file.exists(file)) {
     file_extension <- tools::file_ext(file)
     if (file_extension != "json") {
@@ -37,15 +36,15 @@ curriculum_graph_from_json <- function(file) {
 
   edge_list <- data.frame(from = NA, to = NA)
 
-  for (node in df$name) {
-    str <- subset(df, name == node)$prerequisites[[1]]
+  for (node in df$label) {
+    str <- subset(df, label == node)$prerequisites[[1]]
     course_code <- ""
     if (!is.null(str)) {
       course_code <- str
     }
 
-    from <- rownames(subset(df, name == node))
-    to <- rownames(subset(df, name %in% course_code))
+    from <- rownames(subset(df, label == node))
+    to <- rownames(subset(df, label %in% course_code))
     if (length(to) > 1) {
       for (id in to) {
         edge_list <- rbind(edge_list, data.frame(from = id, to = from))
