@@ -45,6 +45,7 @@ generate_coords <- function(curriculum_graph) {
 #'plot(C)
 #'@export
 plot.curriculum_graph <- function(curriculum_graph) {
+  curriculum_graph$node_list <- curriculum_graph$node_list[order(curriculum_graph$node_list$term), ]
   coords <- generate_coords(curriculum_graph)
   visNetwork::visNetwork(
     curriculum_graph$node_list,

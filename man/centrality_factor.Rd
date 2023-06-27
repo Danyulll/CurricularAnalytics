@@ -36,7 +36,8 @@ long path is a path that satisfies the following conditions:
 
 Let \eqn{P_{v_i}=\{p_1,p_2,\dots\}} denote the set of all paths defined as
 above. Then the centrality of a node \eqn{v_i} is given by
-\deqn{q(b_i)=\sum^{|P_{v_i}|}_{l=1}\#(p_l)}
+\deqn{q(v_i)=\sum^{|P_{v_i}|}_{l=1}\#(p_l)}
+More plainly this is the number of paths containing $v_i$ of at least length 3 where $v_i$ is neither source nor sink node.
 }
 \examples{
 edge_list <- data.frame(from = c(1, 3), to = c(3, 4))
