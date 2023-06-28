@@ -189,7 +189,7 @@ In CurricularAnalytics we store curriculum graphs in json files as suggested in 
 library(CurricularAnalytics)
 
 # Create curriculum graph object C
-C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-Max-2022-2023.json")
+C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Max-2022-2023.json")
 
 # Example creating C from node and edge lists:
 node_list <- C$node_list
@@ -204,7 +204,7 @@ plot(C)
 
 ```{r}
 # Example creating C from json file
-C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-Max-2022-2023.json")
+C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Max-2022-2023.json")
 
 # Plot curriculum graph
 plot(C)
