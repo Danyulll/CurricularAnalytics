@@ -3,50 +3,84 @@
 
 # CurricularAnalytics
 
-<!-- badges: start -->
-<!-- badges: end -->
+CurricularAnalytics is an R package that provides comprehensive
+functionality for implementing a Curricular Analytics framework in
+university curricula.
 
-The goal of CurricularAnalytics is to …
+## Features
+
+- **Metric Calculations:** CurricularAnalytics includes a collection of
+  functions to calculate important metrics such as the delay factor,
+  blocking factor, centrality, and structural complexity. These metrics
+  provide quantitative measures of various aspects of your curriculum,
+  helping you assess its efficiency and effectiveness.
+
+- **Curriculum Graph Manipulation:** This package provides intuitive
+  functions to create, manipulate, and analyze curriculum graphs. You
+  can easily construct curriculum graphs from your own data or existing
+  formats and perform operations like adding or removing courses,
+  modifying prerequisites, and more.
+
+- **Visualization:** CurricularAnalytics offers a range of visualization
+  options to help you explore and present your curriculum data
+  effectively. You can generate visual representations of curriculum
+  graphs, highlighting important nodes and edges, to gain a visual
+  understanding of your curriculum’s structure.
 
 ## Installation
 
-You can install the development version of CurricularAnalytics from
-[GitHub](https://github.com/) with:
+To install CurricularAnalytics, you can use the `devtools` package:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("Danyulll/CurricularAnalytics")
 ```
 
-## Example
+## Getting Started
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(CurricularAnalytics)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+Once you have installed CurricularAnalytics, you can import it into your
+R environment and start utilizing its functionalities. We have provided
+detailed documentation and examples in the vignette to help you get
+started quickly.
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+# TODO make vignette and put function to open it here
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+## Further Reading and Future Plans
 
-You can also embed plots, for example:
+For a complete introduction to the topic of Curricular Analytics please
+see (Heileman et al. 2018). Currently CurricualrAnalytics only
+implements the concepts found in the above paper. There are future plans
+to implement a simulation module similair to CASL (Hickman 2017) and to
+add support for Bayesian Network analyses as done in (Slim et al. 2021).
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+## References
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+<div id="refs" class="references csl-bib-body hanging-indent">
+
+<div id="ref-heileman2018curricular" class="csl-entry">
+
+Heileman, Gregory L, Chaouki T Abdallah, Ahmad Slim, and Michael
+Hickman. 2018. “Curricular Analytics: A Framework for Quantifying the
+Impact of Curricular Reforms and Pedagogical Innovations.” *arXiv
+Preprint arXiv:1811.09676*.
+
+</div>
+
+<div id="ref-hickman2017development" class="csl-entry">
+
+Hickman, Michael S. 2017. “Development of a Curriculum Analysis and
+Simulation Library with Applications in Curricular Analytics.”
+
+</div>
+
+<div id="ref-slim2021restructuring" class="csl-entry">
+
+Slim, Ahmad, Gregory L Heileman, Chaouki T Abdallah, Ameer Slim, and
+Najem N Sirhan. 2021. “Restructuring Curricular Patterns Using Bayesian
+Networks.” In *EDM*.
+
+</div>
+
+</div>

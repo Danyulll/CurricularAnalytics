@@ -1,5 +1,6 @@
 ---
 output: github_document
+bibliography: ./vignettes/references.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -13,43 +14,37 @@ knitr::opts_chunk$set(
 )
 ```
 
+
 # CurricularAnalytics
 
-<!-- badges: start -->
-<!-- badges: end -->
+CurricularAnalytics is an R package that provides comprehensive functionality for implementing a Curricular Analytics framework in university curricula.
 
-The goal of CurricularAnalytics is to ...
+## Features
+
+- **Metric Calculations:** CurricularAnalytics includes a collection of functions to calculate important metrics such as the delay factor, blocking factor, centrality, and structural complexity. These metrics provide quantitative measures of various aspects of your curriculum, helping you assess its efficiency and effectiveness.
+
+- **Curriculum Graph Manipulation:** This package provides intuitive functions to create, manipulate, and analyze curriculum graphs. You can easily construct curriculum graphs from your own data or existing formats and perform operations like adding or removing courses, modifying prerequisites, and more.
+
+- **Visualization:** CurricularAnalytics offers a range of visualization options to help you explore and present your curriculum data effectively. You can generate visual representations of curriculum graphs, highlighting important nodes and edges, to gain a visual understanding of your curriculum's structure.
 
 ## Installation
 
-You can install the development version of CurricularAnalytics from [GitHub](https://github.com/) with:
+To install CurricularAnalytics, you can use the `devtools` package:
 
 ``` r
 # install.packages("devtools")
 devtools::install_github("Danyulll/CurricularAnalytics")
+``` 
+
+## Getting Started
+Once you have installed CurricularAnalytics, you can import it into your R environment and start utilizing its functionalities. We have provided detailed documentation and examples in the vignette to help you get started quickly.
+
+``` r
+# TODO make vignette and put function to open it here
 ```
 
-## Example
+## Further Reading and Future Plans
 
-This is a basic example which shows you how to solve a common problem:
+For a complete introduction to the topic of Curricular Analytics please see [@heileman2018curricular]. Currently CurricualrAnalytics only implements the concepts found in the above paper. There are future plans to implement a simulation module similair to CASL [@hickman2017development] and to add support for Bayesian Network analyses as done in [@slim2021restructuring].
 
-```{r example}
-library(CurricularAnalytics)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+## References

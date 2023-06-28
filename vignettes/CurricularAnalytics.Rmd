@@ -174,6 +174,9 @@ graphs. Therefore, we propose to investigate the maximally and minimally
 structurally complex graphs. This allows the analyst to place upper and
 lower bounds on the structural complexity and see how degree pathways
 interact at the extremes. Additionally, we omit any general electives as we wish to examine the core structure of the curriculum graph.
+
+In CurricularAnalytics we store curriculum graphs in json files as suggested in [@hickman2017development]. One may construct these by hand or use curriculum_graph_to_json() after having made a graph using curriculum_graph_from_list(). 
+
 :::
 
 ::: {}
@@ -181,87 +184,79 @@ interact at the extremes. Additionally, we omit any general electives as we wish
 :::
 
 ::::
-
-In CurricularAnalytics we store curriculum graphs in json files as suggested in [@hickman2017development]. One may construct these by hand or use curriculum_graph_to_json() after having made a graph using curriculum_graph_from_list(). 
-
 ```{r setup}
+# Load library
 library(CurricularAnalytics)
-C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-2022-2023.json")
-C$node_list
 
+# Create curriculum graph object C
+C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-Max-2022-2023.json")
 
- edge_list <- data.frame(from = NA, to = NA)
+# Example creating C from node and edge lists:
+node_list <- C$node_list
+edge_list <- C$edge_list
+C <- curriculum_graph_from_list(node_list, edge_list)
+print(C$node_list)
+print(C$edge_list)
 
-  for (node in df$label) {
-    str <- subset(df, label == node)$prerequisites[[1]]
-    course_code <- ""
-    if (!is.null(str)) {
-      course_code <- str
-    }
-
-    from <- rownames(subset(df, label == node))
-    to <- rownames(subset(df, label %in% course_code))
-    if (length(to) > 1) {
-      for (id in to) {
-        edge_list <- rbind(edge_list, data.frame(from = id, to = from))
-      }
-    } else {
-      edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
-    }
-  }
-  edge_list <- stats::na.omit(edge_list)
-
-
-
-
-
-
-
-
-
-
-
-# plot(C)
+# Plot curriculum graph
+plot(C)
 ```
 
 ```{r}
-file <- "C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-2022-2023.json"
- if (file.exists(file)) {
-    file_extension <- tools::file_ext(file)
-    if (file_extension != "json") {
-      stop("File exists but is not a JSON file.")
-    }
-  } else {
-    stop("File does not exist or cannot be found.")
-  }
+# Example creating C from json file
+C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-Max-2022-2023.json")
 
-  file <- jsonlite::fromJSON(file)
-  json_data <- jsonlite::fromJSON(file)
-  df <- json_data$courses
-  node_list <-
-    data.frame(id = as.numeric(rownames(df)), label = df$label, term = df$term)
-
-  edge_list <- data.frame(from = NA, to = NA)
-
-  for (node in df$name) {
-    str <- subset(df, name == node)$prerequisites[[1]]
-    course_code <- ""
-    if (!is.null(str)) {
-      course_code <- str
-    }
-
-    from <- rownames(subset(df, name == node))
-    to <- rownames(subset(df, name %in% course_code))
-    if (length(to) > 1) {
-      for (id in to) {
-        edge_list <- rbind(edge_list, data.frame(from = id, to = from))
-      }
-    } else {
-      edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
-    }
-  }
-  edge_list <- stats::na.omit(edge_list)
+# Plot curriculum graph
+plot(C)
 ```
+
+These plots are fully interactable allowing you to move nodes around and click on nodes to explore their values. At the top we see the total structural complexity, blocking factor, and delay factor. These metrics speak to the overall complexity of the curriculum graph. Clicking a node reveals its structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df).
+
+Let us first examine our maximally complex curriculum graph. The total structural complexity is 177, the total blocking factor is 74, and the total delay factor is 103. From here we wish to investigate further and the learn the set of course contributing the most to these metrics.
+
+We first list the top course for each metric
+
+```{r}
+# Define helper function for printing courses
+print_top_two_rows <- function(df, column) {
+  ordered_df <- df[rev(order(df[[column]])), ]
+  top_two <- head(ordered_df, 3)
+  print(top_two)
+}
+
+# Print top two courses ordered by each metric
+columns <- colnames(C$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C$node_list, column)
+}
+```
+
+The most central nodes are STAT 230 (73) and MATH 101 (65). From from visual inspection we can see STAT 230 is far too central as almost every edge to an advanced statistics or data science course has a path including STAT 230. STAT 230 is the primary introductory statistics course taken by students in the DS program. MATH 101 is Calculus 2 and since it serves as a rpe-requisite to STAT 230 it seems to take also take on the burden of being and overly central course. This suggests structural revision is need in STAT 230.
+
+The courses with the greatest blocking factors are MATH 100 (17) and MATH 101 (14). These are Calculus 1 and 2 respectively. These inflated blocking factors are an unfortunate and common symptom of many STEM programs where Calculus 1 and 2 act as gateways into almost all course pathways and therefore block progression to many later courses. This often why failing these introductory courses is so detrimental to on-time graduation. This suggests increased resources towards MATH 100 and MATH 101 are warranted and if possible structural revision. Though this pattern is likely unavoidable and therefore so is structural intervention.
+
+The courses with the greatest delay factors are MATH 100, MATH 101, MATH 200, STAT 230, DATA 311, STAT 303, STAT 401, STAT 403, DATA 410 with a value of 5. These courses find themselves a part of the longest pathways in the graph and their high delay factor speaks to the fact that if students wish to take the upper year STATs and DATA courses they must navigate a these very long pathways. We wish for students to graduate on-time and so these pathways are certainly areas that warrant restructuring.
+
+The courses with the largest structural complexity are MATH 100 (22) and MATH 101 (19), again a common theme is having these introductory Calculus courses act as "weeder" courses and unfortunately within STEM curricula this leads to these course be the most frequent contributors to high structural complexity scores.
+
+Through the examination of this graph we now have several areas of potential revision. STAT 230 certainly requires the greatest overhaul. When patterns such as STAT 230 are observed we often seek to split this course into two and divide up the requisite relationships. Furthermore courses that find themselves with high delay factors at the ends of pathways, such as DATA 410, could likely have their prerequisite consolidated into fewer courses and so this will be examined. Lastly MATH 100 and MATH 101 are a common symptom of STEM programs and so we will advise further resources be applied to these courses as opposed to any structural reforms.
+
+Next we investigate the minimally complex curriculum graph.
+
+
+
+```{r}
+# # Example creating C from json file
+# C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-Min-2022-2023.json")
+# 
+# # Plot curriculum graph
+# plot(C)
+```
+
+
+
+
 
 
 # Conclusion
