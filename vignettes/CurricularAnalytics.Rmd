@@ -242,23 +242,210 @@ The courses with the largest structural complexity are MATH 100 (22) and MATH 10
 
 Through the examination of this graph we now have several areas of potential revision. STAT 230 certainly requires the greatest overhaul. When patterns such as STAT 230 are observed we often seek to split this course into two and divide up the requisite relationships. Furthermore courses that find themselves with high delay factors at the ends of pathways, such as DATA 410, could likely have their prerequisite consolidated into fewer courses and so this will be examined. Lastly MATH 100 and MATH 101 are a common symptom of STEM programs and so we will advise further resources be applied to these courses as opposed to any structural reforms.
 
-Next we investigate the minimally complex curriculum graph.
+Next we investigate the minimally complex curriculum graph. For the minimally complex graph we load the graph object from a CSV. This file format allows for specifying curriculum graphs in a far more readable fashion than JSON or node and edge lists. The CSV file must be of the following form:
 
+- id: an integer id for the course
+- label: a string with the name of the course
+- term: an integer specifying what term the course is to be taken
+- requisites: a list of all pre- and co-requisite course ids of the form 1;2;3;...
 
+For example:
+
+```{r, echo=FALSE}
+library(knitr)
+ disp <- data.frame(id = 1:5, label = c("MATH 100", "DATA 101", "MATH 101", "MATH 221", "STAT 230"), term = c(1,1,2,2,3), requisities = c(NA, NA, "1", "3", "3;2"))
+kable(disp)
+```
 
 ```{r}
-# # Example creating C from json file
-# C <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\vignettes\\data\\DS-Major-Min-2022-2023.json")
-# 
-# # Plot curriculum graph
-# plot(C)
+# Example creating C from csvfile
+C <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Min-2022-2023.csv")
+
+# Plot curriculum graph
+plot(C)
+```
+
+The total structural complexity is 147, the total blocking factor is 56, and the total delay factor is 91. This is quite a bit lower than the maximally complex graph and indicate a sizable range in structural complexity depending on student elective choice.
+
+Listing the top courses for each metric once more:
+
+```{r}
+# Print top two courses ordered by each metric
+columns <- colnames(C$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C$node_list, column)
+}
+```
+The most central nodes are STAT 230 (63), MATH 101 (42), MATH 221 (20). Once Again STAT 230 is the most central node and from visual inspection we see quite a few incoming and outgoing edges. Furthermore MATH 101 also reappears as the second most central node likely due to being a prerequisite to STAT 230. Interestingly MATH 221 finds itself being quite central in this curriculum. Perhaps further investigation into how we can reform connections including MATH 221.
+
+The highest blocking factor courses are MATH 100 (14), MATH 101 (11), COSC 111 (7). We see no changes in the courses with the highest blocking factor.
+
+The highest delay factor courses are MATH 100, MATH 101, STAT 230, DATA 311, STAT 400 with a a factor of 5. We see MATH 100, MATH 101, STAT 230, and DATA 311 reappearing on this list. This makes sense as these courses comprise one of the main pathways in the program of required courses.
+
+The courses with the largest structural complexity are MATH 100 (19), MATH 101 (16), STAT 230 (11). MATH 100 and MATH 101 remain on this list. Again foundational calculus courses are difficult to restructure.
+
+It may also be prudent to examine specifically which courses differ between the two graphs to better understand what elective choices contribute to changes in structural complexity.
+
+```{r, echo=FALSE}
+min_graph <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Min-2022-2023.csv")
+max_graph <- curriculum_graph_from_json("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Max-2022-2023.json")
+
+idx <- !(max_graph$node_list$label %in% min_graph$node_list$label)
+kable(data.frame(Courses=max_graph$node_list$label[idx]))
+```
+
+
+The courses in the min graph that are not found in the max graph are:
+
+```{r, echo=FALSE}
+idx <- !(min_graph$node_list$label %in% max_graph$node_list$label)
+kable(data.frame(Courses=min_graph$node_list$label[idx]))
+```
+
+
+With this we see some common courses appearing which further cements the need to revaluate their requisite relationships. We also see the addition of MATH 221 as being a central course and can been to alter its edges. Next we show how revisions suggested through a Curricular Analytics approach can be made and how these changes positively impact curriculum structure.
+
+
+## 2023/2024 DS Major
+
+In investigating the 2022 - 2023 DS Major curriculum graphs we identified several courses of interest: STAT 230 was far too central with a large majority of course pathways going through this node; DATA 410 had many prequisites contributing to a higher structural complexity; 
+
+```{r}
+# Create curriculum graph
+C <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Max-2023-2024.csv")
+
+# Plot curriculum graph
+plot(C)
+```
+
+## DS Minor
+
+Data Science minors are far more common at UBCO than the major. Therefore examination of the minor could prove impactful as the restructuring of the minor will affect more students. We explore the maximally and minimally complex minor curriculum graphs.
+
+Minors are only 30 credits. In creating minor curriculum graphs we cannot simply sample 30 credits worth of permissible courses as this will exclude important prerequisite courses. We  wish to examine how courses flow into one another therefore we sample 30 credits of minor courses and represent these nodes as circles. We then add triangles for prerequisite courses that are not counted towards the minor but would still be required to take if the student wished to complete the minor counting courses.
+
+Below we demonstrate how one can extract the igraph network curriculum graph object and have more control over the visualization using `visNetwork`. We begin with the maximally structurally complex graph.
+
+```{r}
+library(visNetwork)
+
+# Create Curriculum Graph
+C <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Minor-Max.csv")
+
+C$node_list <- C$node_list[order(C$node_list$term), ]
+
+# Specify shape and group for each node
+C$node_list$shape <- c(rep("circle",10),rep("triangle",16))
+C$node_list$group <- c(rep("FALSE",10),rep("TRUE",16))
+
+# Helper function to generate coordinates
+generate_coords <- function(curriculum_graph) {
+  coords <- matrix(ncol = 2)
+
+  old_term <- 1
+  idx <- -1
+  for (term in curriculum_graph$node_list$term) {
+    if (old_term != term) {
+      idx <- 0
+      old_term <- term
+    } else{
+      idx <- idx + 1
+    }
+    coords <- rbind(coords, c(term, idx))
+  }
+
+  coords <- stats::na.omit(coords)
+  return(coords)
+}
+
+# Create fully customizable plot
+visNetwork(
+  C$node_list,
+  C$edge_list,
+  submain = paste(
+    "Total Structural Complexity:",
+    C$sc_total,
+    "Total Blocking Factor:",
+    C$bf_total,
+    "Total Delay Factor:",
+    C$df_total
+  )
+) %>%
+  visEdges(arrows = "to") %>%
+  visIgraphLayout(layout = "layout.norm", layoutMatrix = generate_coords(C)) %>%
+  visEvents(
+    selectNode = "function(properties) {
+      alert(' sc: ' + this.body.data.nodes.get(properties.nodes[0]).sc + ' cf: ' + this.body.data.nodes.get(properties.nodes[0]).cf + ' bf: ' + this.body.data.nodes.get(properties.nodes[0]).bf + ' df: ' + this.body.data.nodes.get(properties.nodes[0]).df);}"
+  )%>%
+  visGroups(groupname = "TRUE", color = "red") %>%
+  visGroups(groupname = "FALSE", color = "lightblue") %>%
+  visLegend(width = 0.1, position = "right", main = "Is a Preqreq in the Minor")
+```
+
+Next is the minimally structurally complex graph.
+
+```{r}
+# Create Curriculum Graph
+C <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Minor-Min.csv")
+
+C$node_list <- C$node_list[order(C$node_list$term), ]
+
+# Specify shape and group for each node
+C$node_list$shape <- c(rep("circle",9),rep("triangle",3))
+C$node_list$group <- c(rep("FALSE",9),rep("TRUE",3))
+
+visNetwork(
+  C$node_list,
+  C$edge_list,
+  submain = paste(
+    "Total Structural Complexity:",
+    C$sc_total,
+    "Total Blocking Factor:",
+    C$bf_total,
+    "Total Delay Factor:",
+    C$df_total
+  )
+) %>%
+  visEdges(arrows = "to") %>%
+  visIgraphLayout(layout = "layout.norm", layoutMatrix = generate_coords(C)) %>%
+  visEvents(
+    selectNode = "function(properties) {
+      alert(' sc: ' + this.body.data.nodes.get(properties.nodes[0]).sc + ' cf: ' + this.body.data.nodes.get(properties.nodes[0]).cf + ' bf: ' + this.body.data.nodes.get(properties.nodes[0]).bf + ' df: ' + this.body.data.nodes.get(properties.nodes[0]).df);}"
+  )%>%
+  visGroups(groupname = "TRUE", color = "red") %>%
+  visGroups(groupname = "FALSE", color = "lightblue") %>%
+  visLegend(width = 0.1, position = "right", main = "Is a Preqreq in the Minor")
+```
+
+## Creation of the DS Math Stream
+
+Curricular Analytics may also be a powerful tool in inventing new programs. We demonstrate this through suggesting a math stream in the DS program. Currently many math electives are available to DS students, what would a DS major look like if we offered a math stream requiring all math electives?
+
+MAX
+
+```{r}
+# Create curriculum graph
+C <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Math-Max.csv")
+
+# Plot curriculum graph
+plot(C)
+```
+
+MIN
+
+```{r}
+# Create curriculum graph
+C <- curriculum_graph_from_csv("C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\DS-Major-Math-Min.csv")
+
+# Plot curriculum graph
+plot(C)
 ```
 
 
 
-
-
-
 # Conclusion
+
+You can do cool stuff with curricular analytics
 
 # References
