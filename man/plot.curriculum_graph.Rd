@@ -4,12 +4,16 @@
 \alias{plot.curriculum_graph}
 \title{Plot a curriculum graph}
 \usage{
-\method{plot}{curriculum_graph}(curriculum_graph)
+\method{plot}{curriculum_graph}(curriculum_graph, width = "100\%", height = 500)
 }
 \arguments{
 \item{curriculum_graph}{A curriculum_graph object created with either
 \code{\link[=curriculum_graph_from_list]{curriculum_graph_from_list()}} or
 \code{\link[=curriculum_graph_from_json]{curriculum_graph_from_json()}}}
+
+\item{width}{A string percentage for the width of the plot, default is "100\%".}
+
+\item{height}{An integer representing the number of pixels for the height, default is 500.}
 }
 \value{
 No object is returned. Rather the graph is plotted according to the specified term order in node_list. Clicking on a node will reveal its label, structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df)

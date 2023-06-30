@@ -10,8 +10,7 @@
 #'The blocking factor for an entire curriculum graph \eqn{G_c} is defined as
 #'\deqn{b(G_c)=\sum_{v_i \in V} b_c(v_i)}
 #'@param node_list dataframe with at least an 'id' column for each node and a
-#'  'term' column specifying which term the course is to be taken in. Nodes in
-#'  node list must be placed sequentially in term order to be properly
+#'  'term' column specifying which term the course is to be taken in.
 #'  displayed. Additional node information can be added as needed.
 #'@param edge_list dataframe with two columns 'from' and 'to' specifying
 #'  directed edges starting at 'from' nodes directed towards 'to' nodes. Entries

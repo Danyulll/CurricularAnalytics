@@ -25,6 +25,8 @@ generate_coords <- function(curriculum_graph) {
 #'@param curriculum_graph  A curriculum_graph object created with either
 #'  [CurricularAnalytics::curriculum_graph_from_list()] or
 #'  [CurricularAnalytics::curriculum_graph_from_json()]
+#'@param width A string percentage for the width of the plot, default is "100%".
+#'@param height An integer representing the number of pixels for the height, default is 500.
 #'
 #'@return No object is returned. Rather the graph is plotted according to the specified term order in node_list. Clicking on a node will reveal its label, structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df)
 #'@author Daniel Krasnov
@@ -44,12 +46,15 @@ generate_coords <- function(curriculum_graph) {
 #'C <- curriculum_graph_from_list(node_list,edge_list)
 #'plot(C)
 #'@export
-plot.curriculum_graph <- function(curriculum_graph) {
-  curriculum_graph$node_list <- curriculum_graph$node_list[order(curriculum_graph$node_list$term), ]
+plot.curriculum_graph <- function(curriculum_graph, width = "100%", height = 500) {
+  curriculum_graph$node_list <-
+    curriculum_graph$node_list[order(curriculum_graph$node_list$term),]
   coords <- generate_coords(curriculum_graph)
   visNetwork::visNetwork(
     curriculum_graph$node_list,
     curriculum_graph$edge_list,
+    width = width,
+    height = height,
     submain = paste(
       "Total Structural Complexity:",
       curriculum_graph$sc_total,

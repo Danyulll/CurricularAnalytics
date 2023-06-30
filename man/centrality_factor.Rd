@@ -8,8 +8,7 @@ centrality_factor(node_list, edge_list)
 }
 \arguments{
 \item{node_list}{dataframe with at least an 'id' column for each node and a
-'term' column specifying which term the course is to be taken in. Nodes in
-node list must be placed sequentially in term order to be properly
+'term' column specifying which term the course is to be taken in.
 displayed. Additional node information can be added as needed.}
 
 \item{edge_list}{dataframe with two columns 'from' and 'to' specifying
