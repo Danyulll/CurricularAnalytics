@@ -44,7 +44,7 @@ detailed documentation and examples in the vignette to help you get
 started quickly.
 
 ``` r
-# TODO make vignette and put function to open it here
+vignette("CurricularAnalytics")
 ```
 
 ## Further Reading and Future Plans

@@ -40,7 +40,7 @@ devtools::install_github("Danyulll/CurricularAnalytics")
 Once you have installed CurricularAnalytics, you can import it into your R environment and start utilizing its functionalities. We have provided detailed documentation and examples in the vignette to help you get started quickly.
 
 ``` r
-# TODO make vignette and put function to open it here
+vignette("CurricularAnalytics")
 ```
 
 ## Further Reading and Future Plans
