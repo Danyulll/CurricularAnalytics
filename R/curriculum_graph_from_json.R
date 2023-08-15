@@ -13,9 +13,11 @@
 #'  structural complexity of the curriculum graph} \item{bf_total}{Total
 #'  blocking factor of the curriculum graph} \item{df_total}{Total delay factor
 #'  of the curriculum graph}
-#' @export
-#'
 #' @examples
+#' # For an example of json file structuring see vignette
+#' C <- curriculum_graph_from_json("./data/json_example.json")
+#' plot(C)
+#' @export
 #'
 #'
 curriculum_graph_from_json <- function(file) {

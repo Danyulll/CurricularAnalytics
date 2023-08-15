@@ -23,3 +23,8 @@ of the curriculum graph}
 \description{
 Generates a curriculum graph from a json file.
 }
+\examples{
+# For an example of json file structuring see vignette
+C <- curriculum_graph_from_json("./data/json_example.json")
+plot(C)
+}

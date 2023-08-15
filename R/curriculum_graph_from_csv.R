@@ -7,7 +7,7 @@
 #'- label: a string with the name of the course
 #'- term: an integer specifying what term the course is to be taken
 #'- requisites: a list of all pre- and co-requisite course ids of the form 1;2;3;...
-#'@return
+#'@return Returns a curriculum graph object based on the read csv file.
 #'@export
 #'
 #' @examples
@@ -19,7 +19,7 @@
 #' #4	MATH 221	2	3
 #' #5	STAT 230	3	3;2
 #'filepath <-
-#'"C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\Example-Curriculum.csv"
+#'".\\data\\Example-Curriculum.csv"
 #'C <- curriculum_graph_from_csv(filepath)
 #'plot(C)
 #'
@@ -57,9 +57,6 @@ curriculum_graph_from_csv <- function(filepath) {
       }
     }
   }
-  edge_list <- na.omit(edge_list)
+  edge_list <- stats::na.omit(edge_list)
   return(curriculum_graph_from_list(node_list, edge_list))
 }
-
-
-

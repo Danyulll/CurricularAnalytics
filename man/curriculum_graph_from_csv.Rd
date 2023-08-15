@@ -15,6 +15,9 @@ curriculum_graph_from_csv(filepath)
 \item requisites: a list of all pre- and co-requisite course ids of the form 1;2;3;...
 }}
 }
+\value{
+Returns a curriculum graph object based on the read csv file.
+}
 \description{
 Generates a curriculum graph from a csv file.
 }
@@ -27,7 +30,7 @@ Generates a curriculum graph from a csv file.
 #4	MATH 221	2	3
 #5	STAT 230	3	3;2
 filepath <-
-"C:\\\\Users\\\\danie\\\\OneDrive\\\\Desktop\\\\CurricularAnalytics\\\\data\\\\Example-Curriculum.csv"
+".\\\\data\\\\Example-Curriculum.csv"
 C <- curriculum_graph_from_csv(filepath)
 plot(C)
 
