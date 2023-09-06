@@ -1,5 +1,5 @@
 ---
-title: "Curricular Analytics"
+title: "CurricularAnalytics"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{CurricularAnalytics}
