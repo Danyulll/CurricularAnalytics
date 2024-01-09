@@ -1,0 +1,1205 @@
+---
+title: "CurricularAnalytics"
+author: "Daniel Krasnov"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CurricularAnalytics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: references.bib
+csl: sty.csl
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+```{=html}
+<script type="text/x-mathjax-config">
+MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
+  MathJax.Hub.Insert(MathJax.InputJax.TeX.Definitions.macros,{
+    cancel: ["Extension","cancel"],
+    bcancel: ["Extension","cancel"],
+    xcancel: ["Extension","cancel"],
+    cancelto: ["Extension","cancel"]
+  });
+});
+</script>
+```
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Introduced by Heileman, Curricular Analytics (CA)
+introduces a framework that allows one to leverage complex network
+analysis when investigating curricula structure, relating the ease with
+which a student progresses through a curriculum to various metrics [@heileman2018curricular]. The package **CurricularAnalytics** provides an implementation
+of the CA framework for use in R. Through it one may construct, visualize, and inspect the properties of curriculum graphs. The metrics currently implemented are:
+
+-   Blocking Factor
+-   Delay Factor
+-   Centrality
+-   Structural Complexity
+
+# Background
+
+## Introduction
+
+CA identifies two primary components when investigating the effect
+curricula has on students as they complete a degree: *structural
+complexity* and *instructional complexity*. Structural complexity has to
+do with how courses are ordered in sequence and more specifically how
+requisite relationships between course orderings impact student success.
+Instructional complexity refers to the quality of instructors, support
+resources, etc. CA postulates that the complexity of a given curriculum
+$c$ will be a function of these two complexities:
+$$\Psi_c = f(\alpha_c,\gamma_c)$$ where
+
+-   $\gamma_c=g(\bar{x}_c)$ represents the instructional complexity
+    which is itself a function of a vector $\bar{x}_c$ containing
+    instructional factors.
+-   $\alpha_c = h(\bar{y}_c)$ represents the structural complexity which
+    is itself a function of a vector $\bar{y}_c$ containing structural
+    factors.
+
+CA's main emphasis is in approximating $\alpha_c$ and altering curricula
+to minimize structural complexity. For more reading on CA and its
+applications see [@heileman2018curricular].
+
+# Metrics
+
+## Notation
+
+Curricula are represented as *directed acyclic graphs* (DAGs). Nodes
+represent courses and directed edges exist between nodes that hold pre-
+or co-requisite relationships. Mathematically, for a curriculum $c$ that
+hold $n$ courses we construct a *curriculum graph* $G_c=(V,E)$ where
+each $v \in V = \{v_1,\dots,v_n\}$ represents a course and a directed
+edge $(v_i, v_j) \in E$ exists if course $v_i$ must be completed
+previous or in conjunction with $v_j$. Note, no distinction is made
+between a co- and pre-requisites.
+
+Paths in a curriculum graph will be denoted as follows: a path
+$p \in G_c = (V,E)$ is written $v_i \overset{p}{\rightsquigarrow} v_j$
+where $v_i,v_j \in V$. A path is simply a sequence of vertices
+$\langle v_i,\dots,v_j \rangle$ where if $v_x$ comes before $v_y$ then
+$(v_x,v_y) \in E$. Additionally,
+$\#(v_i \overset{p}{\rightsquigarrow} v_j)$ is used to represent the
+number of nodes on a path.
+
+## Delay Factor
+
+The delay factor of a course is the longest path the nodes finds itself
+on. More formally the delay factor of a node $v_k$ is given by
+
+$$d_c(v_k)=\underset{i,j,l,m}{max}\left\{\#\left(v_i \overset{p_l}{\rightsquigarrow} v_k \overset{p_m}{\rightsquigarrow} v_j \right)\right\}$$
+The delay factor of an entire curriculum graph $G_c$ is defined as
+
+$$d(G_c)=\sum_{v_k \in V}d_c(v_k)$$
+
+## Blocking Factor
+
+Blocking factor quantifies when a failing a course would result in being
+blocked from registering for future courses. More formally the blocking
+factor of a node $v_i$ is defined as
+
+$$b_c(v_i) = \sum_{v_j \in V} I(v_i,v_j)$$ where $I$ is the indicator
+function:
+
+$$=\begin{cases}1, & \text{if } v_i \rightsquigarrow v_j \\ 0, & \text{if }v_i \cancel{\rightsquigarrow} v_j\end{cases}$$
+The blocking factor for an entire curriculum graph $G_c$ is defined as
+
+$$b(G_c)=\sum_{v_i \in V} b_c(v_i)$$
+
+## Centrality
+
+A course is considered central if it has many requisite edges flowing in
+and out of the node. More formally it is the number of long paths that
+include the node. That is, consider a curriculum graph \eqn{G_c} and a
+vertex $v_i$. A long path is a path that satisfies the following
+conditions:
+
+-   $v_i,v_j,v_k$ are distinct
+-   $v_j \rightsquigarrow v_i \rightsquigarrow v_k$
+-   $v_j$ is a source node (in-degree zero)
+-   $v_k$ is a sink node (out-degree zero)
+
+Let $P_{v_i}=\{p_1,p_2,\dots\}$ denote the set of all paths defined as
+above. Then the centrality of a node $v_i$ is given by
+
+$$q(v_i)=\sum^{|P_{v_i}|}_{l=1}\#(p_l)$$ 
+
+More plainly, this is the number
+of paths containing $v_i$ of at least length 3 where $v_i$ is neither
+source nor sink node.
+
+## Structural Complexity
+
+The structural complexity of a node $v_k$ is defined as a linear
+combination of the node's delay and blocking factors. More formally
+
+$$h(v_k) = d(v_k) + b(v_k)$$ The structural complexity of an entire
+curriculum graph $G_c$ is defined as
+
+$$h(G_c)=d(G_c)+b(G_c)=\sum_{v_k \in V} \left(d_c(v_k) + b_c(v_k)\right)$$
+
+# Example Analysis
+
+The following examples present how one may use **CurricularAnalytics** to
+analyze university curricula and inform curriculum revision and
+creation. The analysis is conducted on the Data Science (DS) curriculum
+found at the University of British Columbia - Okanagan (UBCO). As Data
+Science is a rapidly evolving discipline the program has gone through
+many iterations with several major overhauls having been implemented in
+the last five years. The analysis investigates the current 2022 and 2023
+DS majors, the 2022 DS minor, and the proposal of a math stream in the
+2022 DS major.
+
+## 2022/2023 DS Major
+
+
+:::: {style="display: flex;"}
+
+::: {}
+Within the final years of the DS program at UBCO students have a wide
+selection of DS-related elective credits. The rational behind this being
+that DS is a very broad field which allows students to acquire key core
+skills in their first two and a half years and then proceed to focus on
+subject areas that interest them the most.
+
+The result, however, is an increase in the variability of curriculum
+graphs. Therefore, we propose to investigate the maximally and minimally
+structurally complex graphs. This allows the analyst to place upper and
+lower bounds on the structural complexity and see how degree pathways
+interact at the extremes. Additionally, we omit any general electives as we wish to examine the core structure of the curriculum graph.
+:::
+
+::: {}
+![](figs/2022_DS_Major.png){width="400"}
+:::
+
+::::
+
+### Creating Curriculum Graphs
+
+In **CurricularAnalytics** there are several ways to store and create curriculum graph objects. We can store curriculum graphs in json files or CSV files. If stored in this way, one may load their graph through the respective json and csv functions: `curriculum_graph_from_json()` or `curriculum_graph_from_csv()`. Additionally, one may create a curriculum graph by hand in R through first creating node and edge lists and then calling `curriculum_graph_from_list()`. 
+
+JSON files must be of the following format
+
+- An entry called terms specifying the number of terms in the curriculum
+- A list holding all course information: 
+  - label: string indicating course 
+  - term: integer indicating what term the course is to be taken
+  - prerequisties: list holding strings with prequsitie course labels
+  - corequisites: list holding strings with corequisite course labels
+  
+e.g.,
+```
+[
+  "{\"terms\":[2],
+  \"courses\":[
+    {
+      \"label\":\"MATH 101\",
+      \"term\":2,
+      \"prerequisites\":[[\"MATH 100\"]],
+      \"corequisites\":[]},
+    {
+      \"label\":\"MATH 221\",
+      \"term\":2,
+      \"prerequisites\":[],
+      \"corequisites\":[[\"MATH 101\"]]},
+    {
+      \"label\":\"MATH 100\",
+      \"term\":1,
+      \"prerequisites\":[],
+      \"corequisites\":[]},
+    {
+      \"label\":\"DATA 101\",
+      \"term\":1,
+      \"prerequisites\":[],
+      \"corequisites\":[]
+    }
+      ]
+        }"
+          ]
+ ``` 
+ 
+ 
+```{r}
+# Load library
+library(CurricularAnalytics)
+
+# Example creating C from JSON file:
+C <- curriculum_graph_from_json("..\\data\\DS-Major-Max-2022-2023.json")
+```
+
+
+CSVs are specified as follows:
+
+- id: an integer id for the course
+- label: a string with the name of the course
+- term: an integer specifying what term the course is to be taken
+- requisites: a list of all pre- and co-requisite course ids of the form 1;2;3;...
+
+e.g.,
+
+```{r, echo=FALSE}
+library(knitr)
+ disp <- data.frame(id = 1:5, label = c("MATH 100", "DATA 101", "MATH 101", "MATH 221", "STAT 230"), term = c(1,1,2,2,3), requisities = c(NA, NA, "1", "3", "3;2"))
+kable(disp)
+```
+
+```{r}
+#  Example creating C from CSV file
+C <- curriculum_graph_from_csv("..\\data\\DS-Major-Max-2023-2024.csv")
+```
+
+
+To create graphs using node and edge dataframes we do the following
+
+
+```{r}
+# Example creating C from node and edge lists:
+node_list <- C$node_list[,1:3]
+edge_list <- C$edge_list
+
+# Printing example of what such lists look like
+print(head(node_list))
+print(head(edge_list))
+C <- curriculum_graph_from_list(node_list, edge_list)
+
+# Plot curriculum graph
+plot(C)
+```
+
+
+These plots are fully interactable allowing you to move nodes around and click on nodes to explore their values. At the top we see the total structural complexity, blocking factor, and delay factor. These metrics speak to the overall complexity of the curriculum graph. Clicking a node reveals its structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df).
+
+### Maximally Complex 2022/2023 DS Major
+
+Now we move onto the example analyses. Let us first examine our maximally complex curriculum graph. To do so we generate 1000 curriculum graphs from DS program requirements. There will be much variation in graphs and the most and least structurally complex graphs will likely not be unique. We do not have support in this package for generating max and min curriculum graphs as programs are so variable across universities.
+
+
+```{r, echo=FALSE}
+#TODO should we include this DGP?
+# library(stringi)
+# library(stringr)
+
+# get_course_codes <- function(str) {
+#   if (grepl("and", str)) {
+#     str <- trimws(unlist(strsplit(str, "and")))
+#   }
+# 
+#   present <-
+#     vapply(str, function(x)
+#       grepl("one of", x), logical(1))
+#   if (TRUE %in% present) {
+#     idx <- which(present == TRUE)
+#     course_codes <-
+#       str_extract_all(str[idx], "\\b[A-Z]{4} \\d{3}\\b")[[1]]
+#     str[idx] <- sample(course_codes, 1)
+#   }
+# 
+#   present <-
+#     vapply(str, function(x)
+#       grepl("either", x), logical(1))
+#   if (TRUE %in% present) {
+#     idx <- which(present == TRUE)
+#     course_codes <-
+#       str_extract_all(str[idx], "\\b[A-Z]{4} \\d{3}\\b")[[1]]
+#     str[idx] <- sample(course_codes, 1)
+#   }
+# 
+#   present <-
+#     vapply(str, function(x)
+#       grepl("All of", x), logical(1))
+#   if (TRUE %in% present) {
+#     idx <- which(present == TRUE)
+#     course_codes <-
+#       str_extract_all(str[idx], "\\b[A-Z]{4} \\d{3}\\b")[[1]]
+#     str <- str[-idx]
+#     str <- c(str, course_codes)
+#   }
+# 
+#   return(str_extract_all(paste(str, collapse = " "), "\\b[A-Z]{4} \\d{3}\\b")[[1]])
+# 
+# }
+# 
+# ubco <-
+#   read.csv(
+#     "C:\\Users\\danie\\OneDrive\\Desktop\\CurricularAnalytics\\data\\UBCO_Course_Calendar.csv"
+#   )
+# ubco$Prerequisite <-
+#   stri_replace_all_fixed(ubco$Prerequisite, "\xa0", "")
+# ubco$Prerequisite <- gsub("[[:punct:]]", "", ubco$Prerequisite)
+# ubco$Corequisite <-
+#   stri_replace_all_fixed(ubco$Corequisite, "\xa0", "")
+# 
+# # Create list for storing pathways
+# Gc <- list()
+# 
+# set.seed(87460945)
+# 
+# for (i in 1:1000) {
+#   # Generate degree pathway
+#   pathway <-
+#     data.frame(
+#       Course.Code = NA,
+#       Course.Name = NA,
+#       Course.Description = NA,
+#       Prerequisite = NA,
+#       Corequisite = NA,
+#       Equivalents = NA,
+#       Term = NA
+#     )
+# 
+#   # First Year
+#   pathway <-
+#     rbind(pathway, cbind(
+#       subset(ubco, Course.Code == "DATA 101"),
+#       data.frame("Term" =
+#                    c(2))
+#     ))
+#   samp <- sample(c("CHEM 111", "CHEM 121"), 1)
+#   pathway <-
+#     rbind(pathway, cbind(subset(ubco, Course.Code == samp), data.frame("Term" =
+#                                                                          c(1))))
+#   pathway <-
+#     rbind(pathway, cbind(subset(
+#       ubco, Course.Code %in% c("MATH 100", "MATH 101")
+#     ), data.frame("Term" = c(1, 2))))
+#   samp <- sample(c(TRUE, FALSE), 1)
+# 
+#   if (samp) {
+#     pathway <-
+#       rbind(pathway, cbind(
+#         subset(ubco, Course.Code == "ENGL 109"),
+#         data.frame("Term" = c(1))
+#       ))
+#   } else {
+#     samp <- sample(
+#       c(
+#         "ENGL 112",
+#         "ENGL 113",
+#         "ENGL 114",
+#         "ENGL 150",
+#         "ENGL 151",
+#         "ENGL 153",
+#         "ENGL 154",
+#         "ENGL 155",
+#         "ENGL 156"
+#       ),
+#       2
+#     )
+#     pathway <-
+#       rbind(pathway, cbind(subset(ubco, Course.Code %in% samp), data.frame("Term" =
+#                                                                              c(1, 2))))
+#   }
+# 
+# 
+#   samp <- c("PHYS 111", "PHYS 121")
+#   pathway <-
+#     rbind(pathway, cbind(subset(ubco, Course.Code %in% samp), data.frame("Term" =
+#                                                                            c(1, 2))))
+# 
+#   pathway <-
+#     rbind(pathway, cbind(subset(
+#       ubco, Course.Code %in% c("COSC 111", "COSC 121")
+#     ), data.frame("Term" = c(1, 2))))
+# 
+# 
+#   # Second Year
+#   pathway <-
+#     rbind(pathway, cbind(subset(
+#       ubco,
+#       Course.Code %in% c("MATH 221",
+#                          "MATH 200",
+#                          "STAT 230",
+#                          "COSC 221",
+#                          "COSC 222")
+#     ), data.frame("Term" = c(3, 2, 3, 3, 3))))
+# 
+# 
+#   # Third and Fourth Year
+#   pathway <-
+#     rbind(pathway, cbind(subset(
+#       ubco,
+#       Course.Code %in% c("DATA 301",
+#                          "DATA 311",
+#                          "COSC 304",
+#                          "STAT 303",
+#                          "PHIL 331")
+#     ), data.frame("Term" = rep(4, 5))))
+# 
+# 
+# 
+#   upper_year_data <-
+#     c("DATA 310", "DATA 315", "DATA 405", "DATA 407", "DATA 410")
+#   max_2_stat <- c("STAT 400", "STAT 401", "STAT 403", "STAT 406")
+# 
+#   # Removed MATH 303 because equiv to COSC 303
+#   max_2_cosc_math_phys <-
+#     c(
+#       "COSC 303",
+#       "COSC 322",
+#       "COSC 329",
+#       "COSC 344",
+#       "COSC 407",
+#       "COSC 421",
+#       "MATH 307",
+#       "MATH 409",
+#       "PHYS 420"
+#     )
+#   course <- c()
+#   while (length(unique(course)) < 9) {
+#     var <- sample(c("1", "2", "3"), 1)
+# 
+#     if (var == 1) {
+#       course <- c(course, sample(max_2_stat, 1))
+#     } else if (var == 2) {
+#       course <- c(course, sample(max_2_cosc_math_phys, 1))
+#     } else if (var == 3) {
+#       course <- c(course, sample(upper_year_data, 1))
+#     }
+#   }
+# 
+#   pathway <-
+#     rbind(pathway, cbind(
+#       subset(ubco, Course.Code %in% unique(course)),
+#       data.frame("Term" =
+#                    c(rep(5, 5), rep(6, 4)))
+#     ))
+# 
+#   pathway <- na.omit(pathway)
+#   rownames(pathway) <- 1:nrow(pathway)
+# 
+#   # Construct node and edge list
+# 
+#   node_list <-
+#     data.frame(
+#       id = rownames(pathway),
+#       label = pathway$Course.Code,
+#       term = pathway$Term
+#     )
+# 
+#   edge_list <- data.frame(from = NA, to = NA)
+# 
+#   for (node in node_list$label) {
+#     # node = "COSC 329"
+#     str <- subset(pathway, Course.Code == node)$Prerequisite
+#     str <- get_course_codes(str)
+# 
+#     from <- rownames(subset(pathway, Course.Code == node))
+#     to <- rownames(subset(pathway, Course.Code %in% str))
+#     if (length(to) > 1) {
+#       for (id in to) {
+#         edge_list <- rbind(edge_list, data.frame(from = id, to = from))
+#       }
+#     } else {
+#       edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
+#     }
+# 
+#     str <- subset(pathway, Course.Code == node)$Corequisite
+#     str <- get_course_codes(str)
+# 
+#     from <- rownames(subset(pathway, Course.Code == node))
+#     to <- rownames(subset(pathway, Course.Code %in% str))
+#     if (length(to) > 1) {
+#       for (id in to) {
+#         edge_list <- rbind(edge_list, data.frame(from = id, to = from))
+#       }
+#     } else {
+#       edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
+#     }
+#   }
+#   edge_list <- na.omit(edge_list)
+#   node_list$id <- as.numeric(node_list$id)
+#   C <- curriculum_graph_from_list(node_list, edge_list)
+#   Gc <- c(Gc, list(C))
+# }
+# 
+# # # Initialize variables for maximum and minimum values
+# max_total <- -Inf
+# min_total <- Inf
+# max_index <- NULL
+# min_index <- NULL
+# #
+# # # Iterate through Gc to find max and min indices
+# for (i in seq_along(Gc)) {
+#   total <- sum(Gc[[i]]$sc_total)
+#   if (total > max_total) {
+#     max_total <- total
+#     max_index <- i
+#   }
+#   if (total < min_total) {
+#     min_total <- total
+#     min_index <- i
+#   }
+# }
+# 
+# C_max <- Gc[[max_index]]
+# save(C_max, file = "../data/DS-2022-Max-Graph.RData")
+# 
+# C_min <- Gc[[min_index]]
+# save(C_min, file = "../data/DS-2022-Min-Graph.RData")
+```
+
+
+```{r}
+load("../data/DS-2022-Max-Graph.RData")
+plot(C_max, height = 700)
+```
+
+The total structural complexity is 217, the total blocking factor is 96, and the total delay factor is 121. From here we wish to investigate further and the learn the set of course contributing the most to these metrics.
+
+We first list the top course for each metric
+
+```{r}
+# Define helper function for printing courses
+print_top_two_rows <- function(df, column) {
+  ordered_df <- df[rev(order(df[[column]])), ]
+  top_two <- head(ordered_df, 3)
+  print(top_two)
+}
+
+# Print top two courses ordered by each metric
+columns <- colnames(C_max$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C_max$node_list, column)
+}
+```
+
+The most central nodes are STAT 230 (266) and COSC 221 (184). From visual inspection we can see STAT 230 is far too central as almost every edge to an advanced statistics or data science course has a path including STAT 230. STAT 230 is the primary introductory statistics course taken by students in the DS program. COSC 221 is Discrete Math and since it serves as a pre-requisite to STAT 230 it seems to take also take on the burden of being an overly central course. This suggests structural revision is needed in STAT 230.
+
+The courses with the greatest blocking factors are MATH 100 (18), MATH 101 (16), and COSC 111 (16). These are Calculus 1, Calculus 2, and Computer Programming 1 respectively. The inflated blocking factors of our introductory math courses are an unfortunate and common symptom of many STEM programs where Calculus 1 and 2 act as gateways into almost all course pathways. This is often why failing these introductory courses is so detrimental to on-time graduation. This suggests increased resources towards MATH 100 and MATH 101 are warranted and if possible structural revision. Though this pattern is likely unavoidable and therefore so is structural intervention.
+
+The courses with the greatest delay factors are MATH 100, MATH 101, COSC 111, COSC 121, STAT 230, COSC 221, DATA 311, STAT 400, and DATA 410 with a value of 6. These courses find themselves a part of the longest pathways in the graph and their high delay factor speaks to the fact that if students wish to take upper year STAT and DATA courses they must navigate these long pathways. We wish for students to graduate on-time and so these high delay factor pathways are certainly areas that warrant further investigation.
+
+The courses with the largest structural complexity are MATH 100 (24), MATH 101 (22), COSC 111 (22). Again a common theme is having these introductory Calculus courses act as "weeder" courses and, unfortunately, within STEM curricula this leads to these course being the most frequent contributors to high structural complexity scores. Similarly COSC 111 is an introductory programming course that provides much of the needed computing foundation required for statistical analyses.
+
+Through the examination of this graph we now have several areas of potential revision. STAT 230 certainly requires the greatest overhaul. When patterns such as STAT 230 are observed we often seek to split this course into two and divide up the requisite relationships. Furthermore, courses that find themselves with high delay factors at the ends of pathways, such as DATA 410, could likely have their prerequisite consolidated into fewer courses and so this will be examined.
+
+### Minimally Complex 2022/2023 DS Major
+
+Next we investigate the minimally complex curriculum graph.
+
+```{r}
+load("../data/DS-2022-Min-Graph.RData")
+plot(C_min, height = 700)
+```
+
+
+The total structural complexity is 150, the total blocking factor is 58, and the total delay factor is 92. This is quite a bit lower than the maximally complex graph and indicates a sizable range in structural complexity depending on student elective choice.
+
+Listing the top courses for each metric once more:
+
+```{r}
+# Define helper function for printing courses
+print_top_two_rows <- function(df, column) {
+  ordered_df <- df[rev(order(df[[column]])), ]
+  top_two <- head(ordered_df, 3)
+  print(top_two)
+}
+
+# Print top two courses ordered by each metric
+columns <- colnames(C_min$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C_min$node_list, column)
+}
+```
+The most central nodes are STAT 230 (60), MATH 101 (56), MATH 221 (20). Once Again STAT 230 is the most central node and from visual inspection we see quite a few incoming and outgoing edges. MATH 101 also appears as the second most central node likely due to being a prerequisite to STAT 230. Interestingly MATH 221 finds itself being quite central in this curriculum. Perhaps further investigation into how we can reform connections including MATH 221 could be explored.
+
+The highest blocking factor courses are MATH 100 (16), MATH 101 (14), COSC 111 (7).
+
+The highest delay factor courses are MATH 100, MATH 101, MATH 200, STAT 303, and STAT 403 with a a factor of 5. Perhaps alternting STAT 303 can help reduce long paths in this graph.
+
+The courses with the largest structural complexity are MATH 100 (21), MATH 101 (19), STAT 230 (10).
+
+It may also be prudent to examine specifically which courses differ between the two graphs to better understand what elective choices contribute to changes in structural complexity.
+
+The courses in the max graph that are not found in the min graph are:
+
+```{r, echo=FALSE}
+idx <- !(C_max$node_list$label %in% C_min$node_list$label)
+kable(data.frame(Courses=C_max$node_list$label[idx]))
+```
+
+
+The courses in the min graph that are not found in the max graph are:
+
+```{r, echo=FALSE}
+idx <- !(C_min$node_list$label %in% C_max$node_list$label)
+kable(data.frame(Courses=C_min$node_list$label[idx]))
+```
+This highlights how upper year course selection affects complexity measures. Course like DATA 410, as identified earlier, have many prerequisites and are a part of the longest pathway of 6 in the graph. Upper year electives, such as COSc 407, have only 1 prerequisite making their entry easier and thus reducing complexity scores.
+
+## 2023/2024 DS Major
+
+The 2023/2024 school year saw a major overhaul of the UBCO DS program. In investigating the 2022 - 2023 DS Major curriculum graphs we identified several courses and requisite relationships of interest. Let us implement some of these changes for the DS overhaul and see how our structural complexity is impacted.
+
+```{r, echo=FALSE}
+# library(stringi)
+# library(stringr)
+# 
+# get_course_codes <- function(str) {
+#   if (grepl("and", str)) {
+#     str <- trimws(unlist(strsplit(str, "and")))
+#   }
+# 
+#   present <-
+#     vapply(str, function(x)
+#       grepl("one of", x), logical(1))
+#   if (TRUE %in% present) {
+#     idx <- which(present == TRUE)
+#     course_codes <-
+#       str_extract_all(str[idx], "\\b[A-Z]{4} \\d{3}\\b")[[1]]
+#     str[idx] <- sample(course_codes, 1)
+#   }
+# 
+#   present <-
+#     vapply(str, function(x)
+#       grepl("either", x), logical(1))
+#   if (TRUE %in% present) {
+#     idx <- which(present == TRUE)
+#     course_codes <-
+#       str_extract_all(str[idx], "\\b[A-Z]{4} \\d{3}\\b")[[1]]
+#     str[idx] <- sample(course_codes, 1)
+#   }
+# 
+#   present <-
+#     vapply(str, function(x)
+#       grepl("All of", x), logical(1))
+#   if (TRUE %in% present) {
+#     idx <- which(present == TRUE)
+#     course_codes <-
+#       str_extract_all(str[idx], "\\b[A-Z]{4} \\d{3}\\b")[[1]]
+#     str <- str[-idx]
+#     str <- c(str, course_codes)
+#   }
+# 
+#   return(str_extract_all(paste(str, collapse = " "), "\\b[A-Z]{4} \\d{3}\\b")[[1]])
+# 
+# }
+# 
+#  ubco <-
+#    read.csv(
+#      "..\\data\\UBCO_Course_Calendar_new.csv"
+#    )
+# 
+# 
+#  ubco$Prerequisite <-
+#    stri_replace_all_fixed(ubco$Prerequisite, "\xa0", "")
+#  ubco$Prerequisite <- gsub("[[:punct:]]", "", ubco$Prerequisite)
+#  ubco$Corequisite <-
+#    stri_replace_all_fixed(ubco$Corequisite, "\xa0", "")
+# 
+#  # Create list for storing pathways
+#  Gc <- list()
+# 
+#  set.seed(87460945)
+# 
+#   for (i in 1:1000) {
+#    # Generate degree pathway
+#    pathway <-
+#      data.frame(
+#       Course.Code = NA,
+#        Course.Name = NA,
+#       Course.Description = NA,
+#       Prerequisite = NA,
+#        Corequisite = NA,
+#        Equivalents = NA,
+#        Term = NA
+#      )
+# 
+#    # First Year
+#    pathway <-
+#      rbind(pathway, cbind(
+#        subset(ubco, Course.Code == "DATA 101"),
+#        data.frame("Term" =
+#                     c(2))
+#      ))
+# 
+#    pathway <-
+#      rbind(pathway, cbind(subset(
+#        ubco, Course.Code %in% c("MATH 100", "MATH 101")
+#      ), data.frame("Term" = c(1, 2))))
+#    samp <- sample(c(1:3), 1)
+# 
+#    if (samp == 1) {
+#      pathway <-
+#        rbind(pathway, cbind(
+#          subset(ubco, Course.Code == "ENGL 109"),
+#          data.frame("Term" = c(1))
+#        ))
+#    } else if(samp == 2){
+#      samp <- sample(
+#        c(
+#          "ENGL 112",
+#          "ENGL 113",
+#          "ENGL 114",
+#          "ENGL 150",
+#          "ENGL 151",
+#          "ENGL 153",
+#          "ENGL 154",
+#          "ENGL 155",
+#          "ENGL 156"
+#        ),
+#        2
+#      )
+#      pathway <-
+#        rbind(pathway, cbind(subset(ubco, Course.Code %in% samp), data.frame("Term" =
+#                                                                               c(1, 2))))
+#    } else if (samp == 3){
+#       pathway <-
+#        rbind(pathway, cbind(
+#          subset(ubco, Course.Code == "CORH 203"),
+#          data.frame("Term" = c(1))
+#        ))   }
+# 
+#    pathway <-
+#      rbind(pathway, cbind(subset(
+#        ubco, Course.Code %in% c("COSC 111", "COSC 121")
+#      ), data.frame("Term" = c(1, 2))))
+# 
+#    courses <- c("BIOL 116 or BIOL 117", "BIOL 122 or BIOL 125", "BIOL 131", "BIOL 133", "CHEM 111 or CHEM 121","CHEM 113 or CHEM 123", "EESC 111", "EESC 121", "PHYS 111 or PHYS 112", "PHYS 121 or PHYS 122")
+# 
+# 
+#    courses <- sample(courses, 2)
+# 
+#    courses <- str_split(courses, " or ")
+#    courses <- c(sample(unlist(courses[1]),1), sample(unlist(courses[2]),1))
+#    pathway <-
+#      rbind(pathway, cbind(subset(ubco, Course.Code %in% courses), data.frame("Term" = c(1,2))))
+#    pathway <- na.omit(pathway)
+# 
+#    courses <- pathway$Course.Code
+#    for (course in courses) {
+#      if(course == "CORH 203"){
+#        next()
+#      }
+#      subset(pathway, Course.Code == course)$Prerequisite |> get_course_codes() -> cur_course_prereq
+#      for (prereq in cur_course_prereq) {
+#        if (!(prereq %in% pathway$Course.Code)) {
+#          pathway <-
+#            rbind(pathway, cbind(
+#              subset(ubco, Course.Code %in% prereq),
+#              data.frame("Term" = c(1))
+#            ))
+#        }
+#      }
+#    }
+# 
+# 
+#    # Second Year
+#    pathway <-
+#      rbind(pathway, cbind(subset(
+#        ubco,
+#        Course.Code %in% c("MATH 200",
+#                           "MATH 220",
+#                           "MATH 221",
+#                           "MATH 222",
+#                           "MATH 225",
+#                           "STAT 203",
+#                           "STAT 205",
+#                           "COSC 222")
+#      ), data.frame("Term" = rep(3,8))))
+# 
+# 
+#    # Third and Fourth Year
+#    pathway <-
+#      rbind(pathway, cbind(subset(
+#        ubco,
+#        Course.Code %in% c("DATA 310",
+#                           "DATA 311",
+#                           "DATA 315",
+#                           "STAT 303",
+#                           "PHIL 331",
+#                           "COSC 304")
+#      ), data.frame("Term" = rep(4, 6))))
+# 
+# 
+# 
+#    upper_year_data <-
+#      c("DATA 405", "DATA 407", "DATA 410")
+#    
+#    max_2_stat <- c("STAT 400", "STAT 401", "STAT 403", "STAT 406")
+#    stat_counter <- 0
+# 
+#    max_2_cosc_phys <-
+#      c(
+#       "COSC 322","COSC 329", "COSC 344", "COSC 421", "PHYS 420"
+#      )
+#    cosc_counter <- 0
+#    
+#    max_2_math <- c("MATH 303", "MATH 307", "MATH 327", "MATH 409"
+#                    )
+#    math_counter <- 0
+#    
+#    course <- c()
+#    while (length(unique(course)) < 8) {
+#      
+#      var <- sample(c("1", "2", "3", "4"), 1)
+#      
+#      if (var == 1 & sum(max_2_stat %in% unique(course)) < 2) {
+#        
+#        pot_course <- sample(max_2_stat, 1)
+#        
+#        if (!(pot_course %in% pathway$Course.Code)) {
+#          
+#          course <- c(course, pot_course)
+#          stat_counter <- stat_counter + 1
+#        }
+#        
+#      } else if (var == 2 & sum(max_2_cosc_phys %in% unique(course)) < 2) {
+#        pot_course <- sample(max_2_cosc_phys, 1)
+#        if (!(pot_course %in% pathway$Course.Code)) {
+#          course <- c(course, pot_course)
+#          
+#        }
+#      } else if (var == 3) {
+#        pot_course <- sample(upper_year_data, 1)
+#        if (!(pot_course %in% pathway$Course.Code)) {
+#          course <- c(course, pot_course)
+#        }
+#      } else if (var == 4 & sum(max_2_math %in% unique(course)) < 2) {
+#        pot_course <- sample(max_2_math, 1)
+#        if (!(pot_course %in% pathway$Course.Code)) {
+#          course <- c(course, pot_course)
+#        }
+#      }
+#      
+#    }
+# 
+#    
+#   
+#    
+#    pathway <-
+#     rbind(pathway,  cbind(
+#       subset(ubco, Course.Code %in% unique(course)),
+#       data.frame("Term" =
+#                    c(rep(5, 4), rep(6, 4)))
+#     ))
+# 
+# 
+#   rownames(pathway) <- 1:nrow(pathway)
+# 
+#   # Construct node and edge list
+# 
+#   node_list <-
+#     data.frame(
+#       id = rownames(pathway),
+#       label = pathway$Course.Code,
+#       term = pathway$Term
+#     )
+# 
+#   edge_list <- data.frame(from = NA, to = NA)
+# 
+#   for (node in node_list$label) {
+#     # node = "MATH 200"
+#     str <- subset(pathway, Course.Code == node)$Prerequisite
+#     str <- get_course_codes(str)
+# 
+#     from <- rownames(subset(pathway, Course.Code == node))
+#     to <- rownames(subset(pathway, Course.Code %in% str))
+#     if (length(to) > 1) {
+#       for (id in to) {
+#         edge_list <- rbind(edge_list, data.frame(from = id, to = from))
+#       }
+#     } else {
+#       edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
+#     }
+# 
+#     str <- subset(pathway, Course.Code == node)$Corequisite
+#     str <- get_course_codes(str)
+# 
+#     from <- rownames(subset(pathway, Course.Code == node))
+#     to <- rownames(subset(pathway, Course.Code %in% str))
+#     if (length(to) > 1) {
+#       for (id in to) {
+#         edge_list <- rbind(edge_list, data.frame(from = id, to = from))
+#       }
+#     } else {
+#       edge_list <- rbind(edge_list, data.frame(from = to[1], to = from))
+#     }
+#   }
+#   edge_list <- na.omit(edge_list)
+#   node_list$id <- as.numeric(node_list$id)
+#   C <- curriculum_graph_from_list(node_list, edge_list)
+#   Gc <- c(Gc, list(C))
+# }
+# #
+# # # Initialize variables for maximum and minimum values
+# max_total <- -Inf
+# min_total <- Inf
+# max_index <- NULL
+# min_index <- NULL
+# #
+# # # Iterate through Gc to find max and min indices
+# for (i in seq_along(Gc)) {
+#   total <- sum(Gc[[i]]$sc_total)
+#   if (total > max_total) {
+#     max_total <- total
+#     max_index <- i
+#   }
+#   if (total < min_total) {
+#     min_total <- total
+#     min_index <- i
+#   }
+# }
+# 
+# C_max <- Gc[[max_index]]
+# plot(C_max)
+# save(C_max, file = "../data/DS-2023-Max-Graph.RData")
+# # 
+# # 
+# C_min <- Gc[[min_index]]
+# plot(C_min)
+# save(C_min, file = "../data/DS-2023-Min-Graph.RData")
+```
+
+### Maximally Complex 2023/2024 DS Major
+
+```{r}
+load("../data/DS-2023-Max-Graph.RData")
+plot(C_max, height = 700)
+```
+
+The total structural complexity is 239, the total blocking factor is 100, and the total delay factor is 139. At first glance it may seem alarming that our maximally complex graph has had a large structural complexity increase. However, in the new DS program we have specified more required courses. In the previous curriculum students were given more flexibility to choose electives which we omitted from our previous graphs. Had we included these electives we likely would have seen similar numbers as we do currently.
+
+Listing the top course for each metric yields
+
+```{r}
+columns <- colnames(C_max$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C_max$node_list, column)
+}
+```
+
+The most central nodes are STAT 203 (159), STAT 205 (140), and MATH 101 (130). In our new curriculum, STAT 230 has been split into two new courses each tackling different aspects of the original course. STAT 203 is the more theory heavy statistics course that leads into STAT 303, Intermediate Probability, and STAT 401, Statistical Inference. STAT 205 is more applied and includes R programming which is why it serves as the prerequisite for courses like DATA 311, Machine Learning, and DATA 310,Applied Regression Analysis. This structure is preferable as instead of having STAT 230 on every long path through the curriculum we have two fairly central courses that split the long pathways between them.
+
+The courses with the greatest blocking factors are MATH 100 (22), MATH 101 (20), and DATA 101 (12). MATH 100 and 101, being Calculus 1 and 2, retain their high blocking factors. We've added DATA 101 as a prerequisite to STAT 203 which explains its rise in blocking factor compared to previous graphs.
+
+The courses with the greatest delay factors are MATH 100, MATH 101, STAT 203, STAT 205, DATA 311, DATA 315, DATA 310, STAT 400, and DATA 410 with a delay factor of 6. This is similar to the previous graphs.
+
+The courses with the largest structural complexity are unsurprisingly MATH 100 (28), MATH 101 (26), and STAT 203 (17). These 3 courses lead into every major course in the curriculum thus they contribute the most to structural complexity.
+
+The key takeaway from this graph is how the splitting of STAT 230 from one relatively high central course into two relative medium central courses has improved the flow of the curriculum.
+
+### Minimally Complex 2023/2024 DS Major
+
+Once again we invesgitate the minmaly complex graph for the new DS program.
+
+```{r}
+load("../data/DS-2023-Min-Graph.RData")
+plot(C_min, height = 700)
+```
+
+The total structural complexity is 193, the total blocking factor is 77, and the total delay factor is 116. A difference of 46 points in structural complexity compared to the maximally complex graph. This range is quite a bit smaller than the previous curriculum which had a difference of 67 points between the minimally and maximally complex graphs. Next we view individual course metrics.
+
+```{r}
+# Print top two courses ordered by each metric
+columns <- colnames(C_max$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C_max$node_list, column)
+}
+```
+
+The courses with the highest centrality are STAT 203 (159), STAT 205 (140), and MATH 101 (130). This is the same set of courses as before.
+
+The courses with the highest blocking factor are MATH 100 (22), MATH 101 (20), and DATA 101 (12). These courses also appear the same as before. It is interesting DATA 101 appears on this list again further cementing its new found importance in this revised curriculum.
+
+The highest delay factor courses are MATH 100, MATH 101, STAT 203, STAT 205, DATA 311, DATA 310, DATA 315, STAT 400, and DATA 410 at 6. Many of the same courses are a part of the longest paths.
+
+The courses with the largest structural complexity are MATH 100 (28), MATH 101 (26), and STAT 203 (17).
+
+Again it is interesting to see the difference in courses between the max and min curriculum graphs. The courses in the max graph not found in the min graph are:
+
+```{r, echo=FALSE}
+idx <- !(C_max$node_list$label %in% C_min$node_list$label)
+kable(data.frame(Courses=C_max$node_list$label[idx]))
+```
+
+
+The courses in the min graph that are not found in the max graph are:
+
+```{r, echo=FALSE}
+idx <- !(C_min$node_list$label %in% C_max$node_list$label)
+kable(data.frame(Courses=C_min$node_list$label[idx]))
+```
+
+
+## DS Minor
+
+Data Science minors are far more common at UBCO than the major. Therefore examination of the minor could prove impactful as its restructuring  will affect more students. We explore the maximally and minimally complex minor curriculum graphs.
+
+Minors are only 30 credits. In creating minor curriculum graphs we cannot simply sample 30 credits worth of permissible courses as this will exclude important prerequisite courses. We  wish to examine how courses flow into one another therefore we sample 30 credits of minor courses and represent these nodes as circles. We then add triangles for prerequisite courses that are not counted towards the minor but would still be required to take if the student wished to complete the minor counting courses.
+
+Below we demonstrate how one can extract the igraph network curriculum graph object and have more control over the visualization using `visNetwork`. We begin with the maximally structurally complex graph.
+
+```{r}
+library(visNetwork)
+
+# Create Curriculum Graph
+C <- curriculum_graph_from_csv("..\\data\\DS-Minor-Max.csv")
+
+C$node_list <- C$node_list[order(C$node_list$term), ]
+
+# Specify shape and group for each node
+C$node_list$shape <- c(rep("circle",10),rep("triangle",16))
+C$node_list$group <- c(rep("FALSE",10),rep("TRUE",16))
+
+# Helper function to generate coordinates
+generate_coords <- function(curriculum_graph) {
+  coords <- matrix(ncol = 2)
+
+  old_term <- 1
+  idx <- -1
+  for (term in curriculum_graph$node_list$term) {
+    if (old_term != term) {
+      idx <- 0
+      old_term <- term
+    } else{
+      idx <- idx + 1
+    }
+    coords <- rbind(coords, c(term, idx))
+  }
+
+  coords <- stats::na.omit(coords)
+  return(coords)
+}
+
+# Create fully customizable plot
+visNetwork(
+  C$node_list,
+  C$edge_list,
+  height = 700,
+  width = 700,
+  submain = paste(
+    "Total Structural Complexity:",
+    C$sc_total,
+    "Total Blocking Factor:",
+    C$bf_total,
+    "Total Delay Factor:",
+    C$df_total
+  )
+) %>%
+  visEdges(arrows = "to") %>%
+  visIgraphLayout(layout = "layout.norm", layoutMatrix = generate_coords(C)) %>%
+  visEvents(
+    selectNode = "function(properties) {
+      alert(' sc: ' + this.body.data.nodes.get(properties.nodes[0]).sc + ' cf: ' + this.body.data.nodes.get(properties.nodes[0]).cf + ' bf: ' + this.body.data.nodes.get(properties.nodes[0]).bf + ' df: ' + this.body.data.nodes.get(properties.nodes[0]).df);}"
+  )%>%
+  visGroups(groupname = "TRUE", color = "red") %>%
+  visGroups(groupname = "FALSE", color = "lightblue") %>%
+  visLegend(width = 0.1, position = "right", main = "Is a Preqreq in the Minor")
+```
+This graph is quite complex because it has chosen to display both the Applied Science and Psychology routes into the DS minor. What is interesting here is the presence of red arrows to blue nodes. Course with many red in-edges suggest that they would be more difficult to take in the minor as they require many courses outside of what would be counted. Likely such courses are only available to students in DS-adjacent programs such as Computer Science or Statistics.
+
+Next is the minimally structurally complex graph.
+
+```{r}
+# Create Curriculum Graph
+C <- curriculum_graph_from_csv("..\\data\\DS-Minor-Min.csv")
+
+C$node_list <- C$node_list[order(C$node_list$term), ]
+
+# Specify shape and group for each node
+C$node_list$shape <- c(rep("circle",9),rep("triangle",3))
+C$node_list$group <- c(rep("FALSE",9),rep("TRUE",3))
+
+visNetwork(
+  C$node_list,
+  C$edge_list,
+  height = 500,
+  width = 500,
+  submain = paste(
+    "Total Structural Complexity:",
+    C$sc_total,
+    "Total Blocking Factor:",
+    C$bf_total,
+    "Total Delay Factor:",
+    C$df_total
+  )
+) %>%
+  visEdges(arrows = "to") %>%
+  visIgraphLayout(layout = "layout.norm", layoutMatrix = generate_coords(C)) %>%
+  visEvents(
+    selectNode = "function(properties) {
+      alert(' sc: ' + this.body.data.nodes.get(properties.nodes[0]).sc + ' cf: ' + this.body.data.nodes.get(properties.nodes[0]).cf + ' bf: ' + this.body.data.nodes.get(properties.nodes[0]).bf + ' df: ' + this.body.data.nodes.get(properties.nodes[0]).df);}"
+  )%>%
+  visGroups(groupname = "TRUE", color = "red") %>%
+  visGroups(groupname = "FALSE", color = "lightblue") %>%
+  visLegend(width = 0.1, position = "right", main = "Is a Preqreq in the Minor")
+```
+
+This is the minor in its absolute simplest form. What will be of interest in this graph are which courses appear. As this is the easiest way for a general science student to obtain the minor it is likely going to be a popular pathway.
+
+STAT 230 is a prerequisite to nearly half of the minor counting courses. Its centrality was high in the previous major graphs but here its impact is arguably greater since there are so few courses a student can take.
+
+The presence of STAT 303 really only serves to increase the complexity as it forces the addition of MATH 200 and does not flow into any other courses itself. This could suggest we require a different course.
+
+
+## Creation of the DS Math Stream
+
+Next, we demonstrate how **CurricularAnalytics** can help in creating new curricula. Inventing new programs or concentrations can be quite difficult; often there are many moving pieces the curriculum designer must consider. Through its ability to visualize and quantify degree composition our package allows the user to explore potential structures and consider "what-ifs?" with greater ease.
+
+Currently many math electives are available to DS students as of the 2022/2023 academic calendar. What would a DS major look like if we offered a math stream requiring all math electives?
+
+First the maximally complex graph:
+
+```{r}
+# Create curriculum graph
+C <- curriculum_graph_from_csv("..\\data\\DS-Major-Math-Max.csv")
+
+# Plot curriculum graph
+plot(C)
+```
+
+Immedately we are able to visualize what such a concentration may look like. From inspection it looks like there is higher edge density around MATH 221 and MATH 200. MATH 101 seems to feed into a majority of the courses and MATH 409 looks quite difficult to get to. Next we can look at our metrics to quantify these thoughts.
+
+```{r}
+# Print top two courses ordered by each metric
+columns <- colnames(C$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C$node_list, column)
+}
+```
+
+We find that MATH 101 is the most central at a centrality factor of (83). MATH 419 is a part of the highest delay factor nodes agreeing with our inital thought that it could be a difficult course to reach in a math stream. Unsurpsringly MATH 100 and MATH 101 have the high blocking factors and and structural complexities as they are the primary gateway into this variation of the program.
+
+
+Next the minimally complex graph:
+
+```{r}
+# Create curriculum graph
+C <- curriculum_graph_from_csv("..\\data\\DS-Major-Math-Min.csv")
+
+# Plot curriculum graph
+plot(C)
+```
+
+We don't see a very large shift in total structural complexity, a difference of only 9, suggesting the math stream would be quite stable in terms of diffculty. There isn't much room for elective choice and we see many of the same courses appear. Perhaps that observation could prompt us to restructure to allow for more electives. Once again we move onto investigating individual metrics.
+
+```{r}
+# Print top two courses ordered by each metric
+columns <- colnames(C$node_list[,c("bf","df","cf","sc")])
+for (column in columns) {
+  print(paste("Ordering by column:", column))
+  print_top_two_rows(C$node_list, column)
+}
+```
+
+We find much of the same reiterating the stability of such a program.
+
+# Conclusion
+
+In this vignette we give an introduction to our R implementation of Curricular Analytics, a powerful framework for quickly and effectively visualizing and quantifying curricula. Through its use we are able to highlight problematic curriculum structuring and suggest data-driven revisions quantified through metrics such as blocking factor, delay factor, and course centrality.
+
+
+# References
