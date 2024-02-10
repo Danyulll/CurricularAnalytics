@@ -1,6 +1,6 @@
 Package: CurricularAnalytics
 Title: Use The Curricular Analytics Framework To Analyze Curriculum Graphs
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Authors@R: 
     person("Daniel", "Krasnov", , "danielkrasnovdk@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0003-4104-3162"))

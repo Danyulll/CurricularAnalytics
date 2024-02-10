@@ -53,7 +53,7 @@ delay_factor <- function(node_list, edge_list) {
   for (v in as.numeric(node_list$id)) {
     paths <-
       c(paths,
-        igraph::all_simple_paths(network, from = v, mode = "out"))
+        igraph::all_simple_paths(network, from = V(network)[name == v], mode = "out"))
   }
 
   for (v in as.numeric(node_list$id)) {
