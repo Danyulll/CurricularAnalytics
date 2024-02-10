@@ -34,6 +34,7 @@ curriculum_graph_from_csv <- function(filepath) {
   }
 
   df <- utils::read.csv(filepath)
+  df[is.na(df)] <- ""
   node_list <-
     data.frame(id = df$id,
                label = df$label,
