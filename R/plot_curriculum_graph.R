@@ -24,7 +24,7 @@ generate_coords <- function(curriculum_graph) {
 #'
 #'@param curriculum_graph  A curriculum_graph object created with either
 #'  [CurricularAnalytics::curriculum_graph_from_list()] or
-#'  [CurricularAnalytics::curriculum_graph_from_json()]
+#'  [CurricularAnalytics::curriculum_graph_from_csv()]
 #'@param width A string percentage for the width of the plot, default is "100%".
 #'@param height An integer representing the number of pixels for the height, default is 500.
 #'
@@ -44,9 +44,9 @@ generate_coords <- function(curriculum_graph) {
 #'  term = c(1, 1, 2, 2)
 #')
 #'C <- curriculum_graph_from_list(node_list,edge_list)
-#'plot(C)
+#'plot_curriculum_graph(C)
 #'@export
-plot.curriculum_graph <- function(curriculum_graph, width = "100%", height = 500) {
+plot_curriculum_graph <- function(curriculum_graph, width = "100%", height = 500) {
   curriculum_graph$node_list <-
     curriculum_graph$node_list[order(curriculum_graph$node_list$term),]
   coords <- generate_coords(curriculum_graph)
@@ -63,9 +63,9 @@ plot.curriculum_graph <- function(curriculum_graph, width = "100%", height = 500
       "Total Delay Factor:",
       curriculum_graph$df_total
     )
-  ) %>%
-    visNetwork::visEdges(arrows = "to") %>%
-    visNetwork::visIgraphLayout(layout = "layout.norm", layoutMatrix = coords) %>%
+  ) |>
+    visNetwork::visEdges(arrows = "to") |>
+    visNetwork::visIgraphLayout(layout = "layout.norm", layoutMatrix = coords) |>
     visNetwork::visEvents(
       selectNode = "function(properties) {
       alert(' sc: ' + this.body.data.nodes.get(properties.nodes[0]).sc + ' cf: ' + this.body.data.nodes.get(properties.nodes[0]).cf + ' bf: ' + this.body.data.nodes.get(properties.nodes[0]).bf + ' df: ' + this.body.data.nodes.get(properties.nodes[0]).df);}"

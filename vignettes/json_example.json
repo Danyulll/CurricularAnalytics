@@ -1,1 +1,0 @@
-["{\"terms\":[2],\"courses\":[{\"label\":\"MATH 101\",\"term\":2,\"prerequisites\":[[\"MATH 100\"]],\"corequisites\":[]},{\"label\":\"MATH 221\",\"term\":2,\"prerequisites\":[],\"corequisites\":[[\"MATH 101\"]]},{\"label\":\"MATH 100\",\"term\":1,\"prerequisites\":[],\"corequisites\":[]},{\"label\":\"DATA 101\",\"term\":1,\"prerequisites\":[],\"corequisites\":[]}]}"]

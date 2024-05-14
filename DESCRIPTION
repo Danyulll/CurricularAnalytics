@@ -1,25 +1,26 @@
 Package: CurricularAnalytics
-Title: Use The Curricular Analytics Framework To Analyze Curriculum Graphs
-Version: 0.0.1.0000
+Title: Tools for Exploring and Analyzing ‘Curriculum Graphs’
+Version: 1.0.0
 Authors@R: 
-    person("Daniel", "Krasnov", , "danielkrasnovdk@hotmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0003-4104-3162"))
-Description: Functions for analyzing curriculum graphs using the Curricular Analytics Framework.
+    c(person("Daniel", "Krasnov", , "danielkrasnovdk@hotmail.com", role = c("aut"),
+           comment = c(ORCID = "0009-0003-4104-3162")),
+      person("Dr. Irene", "Vrbik", , "irene.vrbik@ubc.ca", role = c("aut", "cre"),
+           comment = c(ORCID = "enter-here")))
+Description: Provides an implementation of ‘Curricular Analytics’, a framework for analyzing and quantifying the complexity of academic curricula. Curricula are modelled as directed acyclic graphs and analytics are provided based on path lengths and edge density. This work directly comes from Heileman et al. (2018) <https://doi.org/10.48550/arXiv.1811.09676>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
+URL: https://github.com/Danyulll/CurricularAnalytics
+BugReports: https://github.com/Danyulll/CurricularAnalytics/issues
+Imports:
+    dplyr (>= 1.1.4),
+    igraph (>= 2.0.3),
+    stats (>= 4.4.0),
+    tools (>= 4.4.0),
+    utils (>= 4.4.0),
+    visNetwork (>= 2.1.2)
 Suggests: 
     knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
-Imports: 
-    dplyr,
-    igraph,
-    jsonlite,
-    visNetwork,
-    tibble,
-    stats,
-    magrittr
+    rmarkdown
 VignetteBuilder: knitr

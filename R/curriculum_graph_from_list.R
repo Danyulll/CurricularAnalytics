@@ -28,7 +28,7 @@
 #'  term = c(1, 1, 2, 2)
 #')
 #'C <- curriculum_graph_from_list(node_list,edge_list)
-#'plot(C)
+#'plot_curriculum_graph(C)
 #'@export
 curriculum_graph_from_list <- function(node_list, edge_list) {
 

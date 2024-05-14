@@ -30,8 +30,8 @@ Generates a curriculum graph from a csv file.
 #4	MATH 221	2	3
 #5	STAT 230	3	3;2
 filepath <-
-".\\\\data\\\\Example-Curriculum.csv"
+system.file("extdata", "Example-Curriculum.csv", package = "CurricularAnalytics")
 C <- curriculum_graph_from_csv(filepath)
-plot(C)
+plot_curriculum_graph(C)
 
 }

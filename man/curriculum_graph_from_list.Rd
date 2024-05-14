@@ -39,7 +39,7 @@ data.frame(
  term = c(1, 1, 2, 2)
 )
 C <- curriculum_graph_from_list(node_list,edge_list)
-plot(C)
+plot_curriculum_graph(C)
 }
 \references{
 Heileman, Gregory L, Chaouki T Abdallah, Ahmad Slim, and Michael
