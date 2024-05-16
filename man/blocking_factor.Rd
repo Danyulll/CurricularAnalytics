@@ -26,8 +26,8 @@ total blocking factor of a curriculum graph.
 \details{
 Blocking quantifies when a failing a course would result in being blocked from registering for future courses. More formally the blocking factor of a node \eqn{v_i} is defined as
 \deqn{b_c(v_i) = \sum_{v_j \in V} I(v_i,v_j)} where \eqn{I} is the indicator
-function: \deqn{=\begin{cases}1, & \text{if } v_i \rightsquigarrow v_j \\ 0, &
-\text{if }v_i \cancel{\rightsquigarrow} v_j\end{cases}}
+function: \deqn{=\begin{cases}1, & \text{if } v_i \to v_j \\ 0, &
+\text{if }v_i \not\to v_j\end{cases}}
 The blocking factor for an entire curriculum graph \eqn{G_c} is defined as
 \deqn{b(G_c)=\sum_{v_i \in V} b_c(v_i)}
 }

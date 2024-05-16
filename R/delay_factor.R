@@ -6,7 +6,7 @@
 #'The delay factor of a course is the longest path the nodes finds itself on.
 #'More formally the delay factor of a node \eqn{v_k} is given by
 #'\deqn{d_c(v_k)=\underset{i,j,l,m}{max}\left\{\#\left(v_i
-#'\overset{p_l}{\rightsquigarrow} v_k \overset{p_m}{\rightsquigarrow} v_j
+#'\overset{p_l}{\to} v_k \overset{p_m}{\to} v_j
 #'\right)\right\}}
 #'The delay factor of an entire curriculum graph \eqn{G_c} is defined as
 #'\deqn{d(G_c)=\sum_{v_k \in V}d_c(v_k)}

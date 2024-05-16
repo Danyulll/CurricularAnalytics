@@ -27,7 +27,7 @@ node. That is, consider a curriculum graph \eqn{G_c} and a vertex \eqn{v_i}. A
 long path is a path that satisfies the following conditions:
 \itemize{
 \item \eqn{v_i,v_j,v_k} are distinct
-\item \eqn{v_j \rightsquigarrow v_i \rightsquigarrow v_k}
+\item \eqn{v_j \to v_i \to v_k}
 \item \eqn{v_j} is a source node (in-degree zero)
 \item \eqn{v_k} is a sink node (out-degree zero)
 }
