@@ -7,17 +7,16 @@
 curriculum_graph_from_list(node_list, edge_list)
 }
 \arguments{
-\item{node_list}{dataframe with at least an 'id' column for each node and a
-'term' column specifying which term the course is to be taken in.
-displayed. Additional node information can be added as needed.}
+\item{node_list}{Dataframe with an 'id' column for each node and a
+'term' column specifying which term the course is to be taken in.}
 
-\item{edge_list}{dataframe with two columns 'from' and 'to' specifying
+\item{edge_list}{Dataframe with two columns 'from' and 'to' specifying
 directed edges starting at 'from' nodes directed towards 'to' nodes. Entries
-must use node ids.}
+must use node ids from \code{node_list}.}
 }
 \value{
 A list that contains the following: \item{node_list}{A dataframe of
-course nodes containg at least their id, term, blocking factor (bf), delay
+course nodes containing their id, term, blocking factor (bf), delay
 factor (df), centrality (cf), and cruciality (sc)} \item{edge_list}{A
 dataframe with two columns 'from' and 'to' specifying directed edges
 starting at 'from' nodes directed towards 'to' nodes.} \item{network}{Igraph

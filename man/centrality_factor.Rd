@@ -7,13 +7,12 @@
 centrality_factor(node_list, edge_list)
 }
 \arguments{
-\item{node_list}{dataframe with at least an 'id' column for each node and a
-'term' column specifying which term the course is to be taken in.
-displayed. Additional node information can be added as needed.}
+\item{node_list}{Dataframe with an 'id' column for each node and a
+'term' column specifying which term the course is to be taken in.}
 
-\item{edge_list}{dataframe with two columns 'from' and 'to' specifying
+\item{edge_list}{Dataframe with two columns 'from' and 'to' specifying
 directed edges starting at 'from' nodes directed towards 'to' nodes. Entries
-must use node ids.}
+must use node ids from \code{node_list}.}
 }
 \value{
 A dataframe containing the centrality of each node
@@ -36,7 +35,7 @@ long path is a path that satisfies the following conditions:
 Let \eqn{P_{v_i}=\{p_1,p_2,\dots\}} denote the set of all paths defined as
 above. Then the centrality of a node \eqn{v_i} is given by
 \deqn{q(v_i)=\sum^{|P_{v_i}|}_{l=1}\#(p_l)}
-More plainly this is the number of paths containing $v_i$ of at least length 3 where $v_i$ is neither source nor sink node.
+More plainly this is the number of paths containing \eqn{v_i} of at least length 3 where \eqn{v_i} is neither a source nor sink node.
 }
 \examples{
 edge_list <- data.frame(from = c(1, 3), to = c(3, 4))

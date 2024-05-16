@@ -9,12 +9,11 @@
 #'\text{if }v_i \cancel{\rightsquigarrow} v_j\end{cases}}
 #'The blocking factor for an entire curriculum graph \eqn{G_c} is defined as
 #'\deqn{b(G_c)=\sum_{v_i \in V} b_c(v_i)}
-#'@param node_list dataframe with at least an 'id' column for each node and a
+#'@param node_list Dataframe with an 'id' column for each node and a
 #'  'term' column specifying which term the course is to be taken in.
-#'  displayed. Additional node information can be added as needed.
-#'@param edge_list dataframe with two columns 'from' and 'to' specifying
+#'@param edge_list Dataframe with two columns 'from' and 'to' specifying
 #'  directed edges starting at 'from' nodes directed towards 'to' nodes. Entries
-#'  must use node ids.
+#'  must use node ids from `node_list`.
 #'@return A list that contains the following: \item{bynode}{A dataframe
 #'  containing the blocking factor of each node} \item{total}{The total blocking
 #'  factor of the curriculum graph}

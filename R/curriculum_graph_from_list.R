@@ -5,7 +5,7 @@
 #'@inheritParams blocking_factor
 #'
 #'@return A list that contains the following: \item{node_list}{A dataframe of
-#'  course nodes containg at least their id, term, blocking factor (bf), delay
+#'  course nodes containing their id, term, blocking factor (bf), delay
 #'  factor (df), centrality (cf), and cruciality (sc)} \item{edge_list}{A
 #'  dataframe with two columns 'from' and 'to' specifying directed edges
 #'  starting at 'from' nodes directed towards 'to' nodes.} \item{network}{Igraph

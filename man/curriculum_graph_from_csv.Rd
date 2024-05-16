@@ -16,7 +16,15 @@ curriculum_graph_from_csv(filepath)
 }}
 }
 \value{
-Returns a curriculum graph object based on the read csv file.
+A list that contains the following: \item{node_list}{A dataframe of
+course nodes containing their id, term, blocking factor (bf), delay
+factor (df), centrality (cf), and cruciality (sc)} \item{edge_list}{A
+dataframe with two columns 'from' and 'to' specifying directed edges
+starting at 'from' nodes directed towards 'to' nodes.} \item{network}{Igraph
+network object representing the curriculum graph} \item{sc_total}{Total
+structural complexity of the curriculum graph} \item{bf_total}{Total
+blocking factor of the curriculum graph} \item{df_total}{Total delay factor
+of the curriculum graph}
 }
 \description{
 Generates a curriculum graph from a csv file.

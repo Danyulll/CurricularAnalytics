@@ -1,3 +1,7 @@
+---
+output: github_document
+---
+
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
@@ -29,8 +33,7 @@ university curricula.
 
 ## Installation
 
-To install CurricularAnalytics, you can use the `devtools` package for
-the latest unstable version or CRAN for the latest stable version:
+To install CurricularAnalytics, you can use the `devtools` package for the latest unstable version or CRAN for the latest stable version:
 
 ``` r
 # unstable
@@ -54,10 +57,9 @@ vignette("Introduction to Curricular Analytics")
 ## Further Reading and Future Plans
 
 For a complete introduction to the topic of Curricular Analytics please
-see (Heileman et al. 2018). Currently CurricularAnalytics only
+see (Heileman et al. 2018). Currently CurricularAnalytics only
 implements the concepts found in the above paper. There are future plans
-to implement predictive models and an interactive R Shiny app based on
-the metrics in this package.
+to implement predictive models and an interactive R Shiny app based on the metrics in this package.
 
 ## References
 
@@ -88,3 +90,4 @@ Networks.” In *EDM*.
 </div>
 
 </div>
+
