@@ -1,8 +1,8 @@
 ---
-title: "Introduction to Curricular Analytics"
+title: "Curricular Analytics"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Introduction_to_Curricular_Analytics}
+  %\VignetteIndexEntry{Curricular Analytics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
@@ -30,7 +30,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-Introduced by Heileman, Curricular AWnalytics (CA)
+Introduced by Heileman, Curricular Analytics (CA)
 introduces a framework that allows one to leverage complex network
 analysis when investigating curricula structure, relating the ease with
 which a student progresses through a curriculum to various metrics [@heileman2018curricular]. The package **CurricularAnalytics** provides an implementation
@@ -77,14 +77,14 @@ hold $n$ courses we construct a *curriculum graph* $G_c=(V,E)$ where
 each $v \in V = \{v_1,\dots,v_n\}$ represents a course and a directed
 edge $(v_i, v_j) \in E$ exists if course $v_i$ must be completed
 previous or in conjunction with $v_j$. Note, no distinction is made
-between a co- and pre-requisites.
+between a co- and pre-requisite.
 
 Paths in a curriculum graph will be denoted as follows: a path
-$p \in G_c = (V,E)$ is written $v_i \overset{p}{\rightsquigarrow} v_j$
+$p \in G_c = (V,E)$ is written $v_i \overset{p}{\to} v_j$
 where $v_i,v_j \in V$. A path is simply a sequence of vertices
 $\langle v_i,\dots,v_j \rangle$ where if $v_x$ comes before $v_y$ then
 $(v_x,v_y) \in E$. Additionally,
-$\#(v_i \overset{p}{\rightsquigarrow} v_j)$ is used to represent the
+$\#(v_i \overset{p}{\to} v_j)$ is used to represent the
 number of nodes on a path.
 
 ## Delay Factor
@@ -92,7 +92,7 @@ number of nodes on a path.
 The delay factor of a course is the longest path the nodes finds itself
 on. More formally the delay factor of a node $v_k$ is given by
 
-$$d_c(v_k)=\underset{i,j,l,m}{max}\left\{\#\left(v_i \overset{p_l}{\rightsquigarrow} v_k \overset{p_m}{\rightsquigarrow} v_j \right)\right\}$$
+$$d_c(v_k)=\underset{i,j,l,m}{max}\left\{\#\left(v_i \overset{p_l}{\to} v_k \overset{p_m}{\to} v_j \right)\right\}$$
 The delay factor of an entire curriculum graph $G_c$ is defined as
 
 $$d(G_c)=\sum_{v_k \in V}d_c(v_k)$$
@@ -106,7 +106,7 @@ factor of a node $v_i$ is defined as
 $$b_c(v_i) = \sum_{v_j \in V} I(v_i,v_j)$$ where $I$ is the indicator
 function:
 
-$$=\begin{cases}1, & \text{if } v_i \rightsquigarrow v_j \\ 0, & \text{if }v_i \cancel{\rightsquigarrow} v_j\end{cases}$$
+$$=\begin{cases}1, & \text{if } v_i \to v_j \\ 0, & \text{if }v_i \cancel{\to} v_j\end{cases}$$
 The blocking factor for an entire curriculum graph $G_c$ is defined as
 
 $$b(G_c)=\sum_{v_i \in V} b_c(v_i)$$
@@ -120,7 +120,7 @@ vertex $v_i$. A long path is a path that satisfies the following
 conditions:
 
 -   $v_i,v_j,v_k$ are distinct
--   $v_j \rightsquigarrow v_i \rightsquigarrow v_k$
+-   $v_j \to v_i \to v_k$
 -   $v_j$ is a source node (in-degree zero)
 -   $v_k$ is a sink node (out-degree zero)
 
@@ -149,15 +149,15 @@ The following examples present how one may use **CurricularAnalytics** to
 analyze university curricula and inform curriculum revision and
 creation. The analysis is conducted on the Data Science (DS) curriculum
 found at the University of British Columbia - Okanagan (UBCO). As Data
-Science is a rapidly evolving discipline the program has gone through
+Science is a rapidly evolving discipline, the program has gone through
 many iterations with several major overhauls having been implemented in
-the last five years. The analysis investigates the current 2022 and 2023
+the last five years. The analysis investigates the 2022 and 2023
 DS majors, the 2022 DS minor, and the proposal of a math stream in the
 2022 DS major.
 
 ## 2022/2023 DS Major
 
-Within the final years of the DS program at UBCO students have a wide
+Within the final years of the DS program at UBCO, students have a wide
 selection of DS-related elective credits. The rational behind this being
 that DS is a very broad field which allows students to acquire key core
 skills in their first two and a half years and then proceed to focus on
@@ -220,7 +220,8 @@ plot_curriculum_graph(C)
 ```
 
 
-These plot_curriculum_graphs are fully interactable allowing you to move nodes around and click on nodes to explore their values. At the top we see the total structural complexity, blocking factor, and delay factor. These metrics speak to the overall complexity of the curriculum graph. Clicking a node reveals its structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df).
+
+These graphs are fully interactable allowing you to move nodes around and click on nodes to explore their values. At the top, we see totals for structural complexity, blocking factor, and delay factor. These metrics speak to the overall complexity of the curriculum graph. Clicking a node reveals its structural complexity (sc), centrality (cf), blocking factor (bf), and delay factor (df).
 
 ### Maximally Complex 2022/2023 DS Major
 
@@ -518,11 +519,11 @@ for (column in columns) {
 
 The most central nodes are STAT 230 (266) and COSC 221 (184). From visual inspection we can see STAT 230 is far too central as almost every edge to an advanced statistics or data science course has a path including STAT 230. STAT 230 is the primary introductory statistics course taken by students in the DS program. COSC 221 is Discrete Math and since it serves as a pre-requisite to STAT 230 it seems to take also take on the burden of being an overly central course. This suggests structural revision is needed in STAT 230.
 
-The courses with the greatest blocking factors are MATH 100 (18), MATH 101 (16), and COSC 111 (16). These are Calculus 1, Calculus 2, and Computer Programming 1 respectively. The inflated blocking factors of our introductory math courses are an unfortunate and common symptom of many STEM programs where Calculus 1 and 2 act as gateways into almost all course pathways. This is often why failing these introductory courses is so detrimental to on-time graduation. This suggests increased resources towards MATH 100 and MATH 101 are warranted and if possible structural revision. Though this pattern is likely unavoidable and therefore so is structural intervention.
+The courses with the greatest blocking factors are MATH 100 (18), MATH 101 (16), and COSC 111 (16). These are Calculus 1, Calculus 2, and Computer Programming 1 respectively. The inflated blocking factors of our introductory math courses are an unfortunate and common symptom of many STEM programs where Calculus 1 and 2 act as gateways into almost all course pathways. This is often why failing these introductory courses is so detrimental to on-time graduation. This suggests increased resources towards MATH 100 and MATH 101 are warranted and if possible, structural revision. Though this pattern is likely unavoidable and therefore so is structural intervention.
 
 The courses with the greatest delay factors are MATH 100, MATH 101, COSC 111, COSC 121, STAT 230, COSC 221, DATA 311, STAT 400, and DATA 410 with a value of 6. These courses find themselves a part of the longest pathways in the graph and their high delay factor speaks to the fact that if students wish to take upper year STAT and DATA courses they must navigate these long pathways. We wish for students to graduate on-time and so these high delay factor pathways are certainly areas that warrant further investigation.
 
-The courses with the largest structural complexity are MATH 100 (24), MATH 101 (22), COSC 111 (22). Again a common theme is having these introductory Calculus courses act as "weeder" courses and, unfortunately, within STEM curricula this leads to these course being the most frequent contributors to high structural complexity scores. Similarly COSC 111 is an introductory programming course that provides much of the needed computing foundation required for statistical analyses.
+The courses with the largest structural complexity are MATH 100 (24), MATH 101 (22), COSC 111 (22). Again a common theme is having these introductory Calculus courses act as "weeder" courses and, unfortunately, within STEM curricula this leads to these course being the most frequent contributors to high structural complexity scores. Similarly, COSC 111 is an introductory programming course that provides much of the needed computing foundation required for statistical analyses.
 
 Through the examination of this graph we now have several areas of potential revision. STAT 230 certainly requires the greatest overhaul. When patterns such as STAT 230 are observed we often seek to split this course into two and divide up the requisite relationships. Furthermore, courses that find themselves with high delay factors at the ends of pathways, such as DATA 410, could likely have their prerequisite consolidated into fewer courses and so this will be examined.
 
@@ -555,11 +556,11 @@ for (column in columns) {
   print_top_two_rows(C_min$node_list, column)
 }
 ```
-The most central nodes are STAT 230 (60), MATH 101 (56), MATH 221 (20). Once Again STAT 230 is the most central node and from visual inspection we see quite a few incoming and outgoing edges. MATH 101 also appears as the second most central node likely due to being a prerequisite to STAT 230. Interestingly MATH 221 finds itself being quite central in this curriculum. Perhaps further investigation into how we can reform connections including MATH 221 could be explored.
+The most central nodes are STAT 230 (60), MATH 101 (56), MATH 221 (20). Once Again STAT 230 is the most central node and from visual inspection we see quite a few incoming and outgoing edges. MATH 101 also appears as the second most central node likely due to being a prerequisite to STAT 230. Interestingly, MATH 221 finds itself being quite central in this curriculum. Perhaps further investigation into how we can reform connections including MATH 221 could be explored.
 
 The highest blocking factor courses are MATH 100 (16), MATH 101 (14), COSC 111 (7).
 
-The highest delay factor courses are MATH 100, MATH 101, MATH 200, STAT 303, and STAT 403 with a a factor of 5. Perhaps alternting STAT 303 can help reduce long paths in this graph.
+The highest delay factor courses are MATH 100, MATH 101, MATH 200, STAT 303, and STAT 403 with a a factor of 5. Perhaps altering STAT 303 can help reduce long paths in this graph.
 
 The courses with the largest structural complexity are MATH 100 (21), MATH 101 (19), STAT 230 (10).
 
@@ -924,7 +925,7 @@ for (column in columns) {
 }
 ```
 
-The most central nodes are STAT 203 (159), STAT 205 (140), and MATH 101 (130). In our new curriculum, STAT 230 has been split into two new courses each tackling different aspects of the original course. STAT 203 is the more theory heavy statistics course that leads into STAT 303, Intermediate Probability, and STAT 401, Statistical Inference. STAT 205 is more applied and includes R programming which is why it serves as the prerequisite for courses like DATA 311, Machine Learning, and DATA 310,Applied Regression Analysis. This structure is preferable as instead of having STAT 230 on every long path through the curriculum we have two fairly central courses that split the long pathways between them.
+The most central nodes are STAT 203 (159), STAT 205 (140), and MATH 101 (130). In our new curriculum, STAT 230 has been split into two new courses each tackling different aspects of the original course. STAT 203 is the more theory heavy statistics course that leads into STAT 303, Intermediate Probability, and STAT 401, Statistical Inference. STAT 205 is more applied and includes R programming which is why it serves as the prerequisite for courses like DATA 311, Machine Learning, and DATA 310, Applied Regression Analysis. This structure is preferable as instead of having STAT 230 on every long path through the curriculum we have two fairly central courses that split the long pathways between them.
 
 The courses with the greatest blocking factors are MATH 100 (22), MATH 101 (20), and DATA 101 (12). MATH 100 and 101, being Calculus 1 and 2, retain their high blocking factors. We've added DATA 101 as a prerequisite to STAT 203 which explains its rise in blocking factor compared to previous graphs.
 
@@ -1082,7 +1083,7 @@ visNetwork(
   visLegend(width = 0.1, position = "right", main = "Is a Preqreq in the Minor")
 ```
 
-This is the minor in its absolute simplest form. What will be of interest in this graph are which courses appear. As this is the easiest way for a general science student to obtain the minor it is likely going to be a popular pathway.
+This is the minor in its absolute simplest form. What will be of interest in this graph is which courses appear. This is because it is the easiest way for a general science student to obtain the minor and thus it is likely going to be a popular pathway.
 
 STAT 230 is a prerequisite to nearly half of the minor counting courses. Its centrality was high in the previous major graphs but here its impact is arguably greater since there are so few courses a student can take.
 
@@ -1091,7 +1092,7 @@ The presence of STAT 303 really only serves to increase the complexity as it for
 
 ## Creation of the DS Math Stream
 
-Next, we demonstrate how **CurricularAnalytics** can help in creating new curricula. Inventing new programs or concentrations can be quite difficult; often there are many moving pieces the curriculum designer must consider. Through its ability to visualize and quantify degree composition our package allows the user to explore potential structures and consider "what-ifs?" with greater ease.
+Next, we demonstrate how **CurricularAnalytics** can help in creating new curricula. Inventing new programs or concentrations can be quite difficult as there are often many moving pieces the curriculum designer must consider. Through its ability to visualize and quantify degree composition, our package allows the user to explore potential structures and consider "what-ifs?" with greater ease.
 
 Currently many math electives are available to DS students as of the 2022/2023 academic calendar. What would a DS major look like if we offered a math stream requiring all math electives?
 
@@ -1144,7 +1145,7 @@ We find much of the same reiterating the stability of such a program.
 
 # Conclusion
 
-In this vignette we give an introduction to our R implementation of Curricular Analytics, a powerful framework for quickly and effectively visualizing and quantifying curricula. Through its use we are able to highlight problematic curriculum structuring and suggest data-driven revisions quantified through metrics such as blocking factor, delay factor, and course centrality.
+In this vignette we give an introduction to our R implementation of Curricular Analytics, a powerful framework for quickly and effectively visualizing and quantifying curricula. Through its use, we are able to highlight problematic curriculum structuring and suggest data-driven revisions quantified through metrics such as blocking factor, delay factor, and course centrality.
 
 
 # References
