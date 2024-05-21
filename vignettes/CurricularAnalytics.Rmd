@@ -1,8 +1,8 @@
 ---
-title: "Curricular Analytics"
+title: "CurricularAnalytics"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Curricular Analytics}
+  %\VignetteIndexEntry{CurricularAnalytics}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 bibliography: references.bib
