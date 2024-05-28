@@ -48,7 +48,7 @@ detailed documentation and examples in the vignette to help you get
 started quickly.
 
 ``` r
-vignette("Introduction to Curricular Analytics")
+vignette("CurricularAnalytics")
 ```
 
 ## Further Reading and Future Plans
