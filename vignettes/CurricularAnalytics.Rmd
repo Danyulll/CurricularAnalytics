@@ -202,7 +202,7 @@ kable(disp)
 
 ```{r}
 #  Example creating C from CSV file
-C <- curriculum_graph_from_csv(".\\data\\DS-Major-Max-2023-2024.csv")
+C <- curriculum_graph_from_csv("./data/DS-Major-Max-2023-2024.csv")
 ```
 
 
@@ -995,7 +995,7 @@ Below we demonstrate how one can extract the igraph network curriculum graph obj
 library(visNetwork)
 
 # Create Curriculum Graph
-C <- curriculum_graph_from_csv(".\\data\\DS-Minor-Max.csv")
+C <- curriculum_graph_from_csv("./data/DS-Minor-Max.csv")
 
 C$node_list <- C$node_list[order(C$node_list$term), ]
 
@@ -1054,7 +1054,7 @@ Next is the minimally structurally complex graph.
 
 ```{r}
 # Create Curriculum Graph
-C <- curriculum_graph_from_csv(".\\data\\DS-Minor-Min.csv")
+C <- curriculum_graph_from_csv("./data/DS-Minor-Min.csv")
 
 C$node_list <- C$node_list[order(C$node_list$term), ]
 
@@ -1104,7 +1104,7 @@ First the maximally complex graph:
 
 ```{r}
 # Create curriculum graph
-C <- curriculum_graph_from_csv(".\\data\\DS-Major-Math-Max.csv")
+C <- curriculum_graph_from_csv("./data/DS-Major-Math-Max.csv")
 
 # plot_curriculum_graph curriculum graph
 plot_curriculum_graph(C)
@@ -1128,7 +1128,7 @@ Next the minimally complex graph:
 
 ```{r}
 # Create curriculum graph
-C <- curriculum_graph_from_csv(".\\data\\DS-Major-Math-Min.csv")
+C <- curriculum_graph_from_csv("./data/DS-Major-Math-Min.csv")
 
 # plot_curriculum_graph curriculum graph
 plot_curriculum_graph(C)
