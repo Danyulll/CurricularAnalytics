@@ -2,9 +2,9 @@ Package: CurricularAnalytics
 Title: Exploring and Analyzing Academic Curricula
 Version: 1.0.0
 Authors@R: 
-    c(person("Daniel", "Krasnov", , "danielkrasnovdk@hotmail.com", role = c("aut"),
+    c(person("Daniel", "Krasnov", , "danielkrasnovdk@hotmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0003-4104-3162")),
-      person("Dr. Irene", "Vrbik", , "irene.vrbik@ubc.ca", role = c("aut", "cre","cph")
+      person("Dr. Irene", "Vrbik", , "irene.vrbik@ubc.ca", role = c("aut","cph")
            ))
 Description: Provides an implementation of ‘Curricular Analytics’, a framework for analyzing and quantifying the complexity of academic curricula. Curricula are modelled as directed acyclic graphs and analytics are provided based on path lengths and edge density. This work directly comes from Heileman et al. (2018) <doi:10.48550/arXiv.1811.09676>.
 License: MIT + file LICENSE

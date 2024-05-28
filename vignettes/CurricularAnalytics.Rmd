@@ -10,7 +10,10 @@ csl: sty.csl
 editor_options: 
   markdown: 
     wrap: 72
+header-includes:
+  - \usepackage{cancel}
 ---
+
 ```{=html}
 <script type="text/x-mathjax-config">
 MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
@@ -23,6 +26,7 @@ MathJax.Hub.Register.StartupHook("TeX Jax Ready",function () {
 });
 </script>
 ```
+
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
