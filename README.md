@@ -72,19 +72,4 @@ Preprint arXiv:1811.09676*.
 
 </div>
 
-<div id="ref-hickman2017development" class="csl-entry">
-
-Hickman, Michael S. 2017. “Development of a Curriculum Analysis and
-Simulation Library with Applications in Curricular Analytics.”
-
-</div>
-
-<div id="ref-slim2021restructuring" class="csl-entry">
-
-Slim, Ahmad, Gregory L Heileman, Chaouki T Abdallah, Ameer Slim, and
-Najem N Sirhan. 2021. “Restructuring Curricular Patterns Using Bayesian
-Networks.” In *EDM*.
-
-</div>
-
 </div>
