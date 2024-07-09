@@ -19,7 +19,12 @@ Imports:
     stats (>= 4.4.0),
     tools (>= 4.4.0),
     utils (>= 4.4.0),
-    visNetwork (>= 2.1.2)
+    visNetwork (>= 2.1.2),
+    stringr,
+    readr,
+    shiny,
+    DBI,
+    RSQLite
 Suggests: 
     knitr,
     rmarkdown
